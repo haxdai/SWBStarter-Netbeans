@@ -1,2 +1,2 @@
-# SWBStarter-Netbeans
-Starter project for SemanticWebBuilder resources using Netbeans IDE
+# Front-end
+Componentes front-end de SemanticWebBuilder Portal para el Repositorio Digital del Patrimonio Cultural de México
