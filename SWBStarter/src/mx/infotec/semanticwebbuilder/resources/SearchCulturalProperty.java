@@ -21,9 +21,11 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import mx.gob.cultura.portal.response.DigitalObject;
+import mx.gob.cultura.portal.response.Identifier;
+import mx.gob.cultura.portal.response.Title;
 import org.semanticwb.SWBUtils;
 
-import org.semanticwb.portal.api.GenericAdmResource;
 import org.semanticwb.portal.api.SWBParamRequest;
 import org.semanticwb.portal.api.SWBResourceException;
 import org.semanticwb.portal.api.SWBResourceModes;
@@ -33,7 +35,7 @@ import org.semanticwb.portal.api.SWBResourceURL;
  *
  * @author sergio.tellez
  */
-public class SearchCulturalProperty extends GenericAdmResource {
+public class SearchCulturalProperty extends PagerAction {
     
     private static final Logger LOG = Logger.getLogger(SearchCulturalProperty.class.getName());
     
@@ -116,23 +118,52 @@ public class SearchCulturalProperty extends GenericAdmResource {
     	RequestDispatcher rd = request.getRequestDispatcher(url);
     	try {
             if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
-    		references = getReferences(request.getParameter("word"), paramRequest);
+    		references = getReferences(request.getParameter("word"), request);
                 int results = references.size();
                 publicationList = getRange(getStart(request), references);
     		request.setAttribute("count", results);
                 request.setAttribute("word", request.getParameter("word"));
-    		request.setAttribute("pages", getPages(request, results));
+                request.getSession().setAttribute(FULL_LIST, references);
+                init(request, response, paramRequest);
+    		//request.setAttribute("pages", getPages(request, paramRequest, results));
     	    }
             request.setAttribute("references", publicationList);
 	    request.setAttribute("paramRequest", paramRequest);
-            paramRequest.getArguments().put("references", references);
+            //paramRequest.getArguments().put("references", references);
 	    rd.include(request, response);
 	}catch (ServletException se) {
             LOG.info(se.getMessage());
 	}
     }
     
-    private List<Entry> getReferences(String words, SWBParamRequest paramRequest) {
+    private String getGrid(List<Entry> references) {
+        StringBuilder grid = new StringBuilder();
+        if (!references.isEmpty()) {
+            for (Entry reference : references) {
+                Identifier identifier = new Identifier();
+                DigitalObject digital = new DigitalObject();
+                List<Title> titles = reference.getTitle();
+                List<DigitalObject> digitalobject = reference.getDigitalobject();
+                List<Identifier> identifiers = reference.getIdentifier();
+                if (!digitalobject.isEmpty()) digital = digitalobject.get(0);
+                for (Identifier id : identifiers) {
+                    if (id.isPreferred()) identifier = id;
+                }
+                grid.append("<div class=\"pieza\">");
+                grid.append("   <div>");
+                grid.append("        <a href=\"/swb/cultura/detalle?id=").append(identifier.getValue()).append("\">");
+                grid.append("           <img src=\"").append(digital.getUrl()).append("\">");
+                grid.append("        </a>");
+                grid.append("   </div>");
+                grid.append("   <p class=\"oswB azul tit\"><a href=\"#\">").append(titles.get(0).getValue()).append("</a></p>");
+                grid.append("   <p class=\"azul autor\"><a href=\"#\">").append(reference.getCreator().get(0)).append("</a></p>");
+                grid.append("</div>");
+            } 
+        }
+        return grid.toString();
+    }
+    
+    private List<Entry> getReferences(String words, HttpServletRequest request) {
     	String uri = getResourceBase().getAttribute("endpointURL","http://localhost:8080") + "/api/v1/search?q=";
     	List<Entry> publicationList = new ArrayList<>();
     	uri += getParamSearch(words);
@@ -145,8 +176,8 @@ public class SearchCulturalProperty extends GenericAdmResource {
             String jsonText = SWBUtils.IO.readInputStream(is);
             Gson gson = new Gson();
             Type entryListType = new TypeToken<ArrayList<Entry>>(){}.getType();
-            if (null != paramRequest.getArguments().get("references"))
-                    publicationList = (List<Entry>)paramRequest.getArguments().get("references");
+            if (null != request.getSession().getAttribute(FULL_LIST))
+                    publicationList = (List<Entry>)request.getSession().getAttribute(FULL_LIST);
             else
                 publicationList = gson.fromJson(jsonText, entryListType);
     	}catch (Exception e) {
@@ -188,8 +219,8 @@ public class SearchCulturalProperty extends GenericAdmResource {
             return words;
     }
     
-    private String getPages(HttpServletRequest request, int results) {
-    	int seg = 5;
+    private String getPages(HttpServletRequest request, SWBParamRequest paramRequest, int results) {
+    	int seg = 8;
     	String innerPages = null;
     	StringBuilder back = new StringBuilder();
     	StringBuilder next = new StringBuilder();
@@ -197,7 +228,11 @@ public class SearchCulturalProperty extends GenericAdmResource {
     	String id=String.valueOf(getResourceBase().getId());
     	if (results > 0) {
             String[] offset={"s"+id};
-            String url2 = getParameters(request, offset);
+            SWBResourceURL urlXML = paramRequest.getRenderUrl();
+            urlXML.setMode(SWBResourceURL.Mode_XML);
+            urlXML.setCallMethod(SWBResourceURL.Call_DIRECT);
+            urlXML.setParameters(request.getParameterMap());
+            //String url2 = getParameters(request, offset);
     	    String start = request.getParameter("s"+id);
     	    int _i = 0; // Contador del segmento
     	    int s = 1;  // Start
@@ -222,7 +257,7 @@ public class SearchCulturalProperty extends GenericAdmResource {
     		if (as < 1) as = 1;
                     //back.append("<a href=\"")
                     back.append("<li><a href=\"")
-                    .append(url2).append("s").append(id).append("=").append(as)
+                    .append(urlXML.toString()).append("s").append(id).append("=").append(as)
                     //.append("\">Anterior</a>");
                     .append("\" class=\"fa fa-long-arrow-left\" aria-hidden=\"true\" title=\"anterior\">&nbsp;</a></li>");
                     pages.append(back).append(" ");
@@ -236,7 +271,7 @@ public class SearchCulturalProperty extends GenericAdmResource {
                             int leap = z - 1;
                             //innerPages="<a href=\"";
                             innerPages="<li><a href=\"";
-                            innerPages+=url2 +"s"+id+"="+((leap * seg) + 1);
+                            innerPages+=urlXML.toString() +"s"+id+"="+((leap * seg) + 1);
                             //innerPages+="\">"+String.valueOf((z))+"</a>";
                             innerPages+="\">"+String.valueOf((z))+"</a></li>";
     			}else
@@ -249,7 +284,7 @@ public class SearchCulturalProperty extends GenericAdmResource {
             if (results >= s + seg) {
     		//next.append("<a href=\"");
     		next.append("<li><a href=\"");
-    		next.append(url2).append("s").append(id).append("=").append((s + seg));
+    		next.append(urlXML.toString()).append("s").append(id).append("=").append((s + seg));
     		//next.append("\">Siguiente</a>");
     		next.append("\" class=\"fa fa-long-arrow-right\" aria-hidden=\"true\" title=\"siguiente\">&nbsp;</a></li>");
     		pages.append(next);
