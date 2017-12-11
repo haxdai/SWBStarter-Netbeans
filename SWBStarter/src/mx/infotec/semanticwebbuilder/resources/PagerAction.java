@@ -27,7 +27,7 @@ import org.semanticwb.portal.api.SWBResourceException;
  */
 public class PagerAction extends GenericResource {
     
-    protected int PAGE_NUM_ROW = 1;
+    protected int PAGE_NUM_ROW = 8;
     protected int PAGE_JUMP_SIZE = 5;
     protected String PAGE_LIST = "PAGE_LIST";
     protected String FULL_LIST = "FULL_LIST";
