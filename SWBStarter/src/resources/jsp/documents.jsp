@@ -7,7 +7,7 @@
     SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
     SWBResourceURL pageURL = paramRequest.getRenderUrl().setMode("PAGE");
     pageURL.setCallMethod(SWBParamRequest.Call_DIRECT);
-	SWBResourceURL pagesURL = paramRequest.getRenderUrl().setMode("PAGES");
+    SWBResourceURL pagesURL = paramRequest.getRenderUrl().setMode("PAGES");
     pagesURL.setCallMethod(SWBParamRequest.Call_DIRECT);
     List<Entry> references = (List<Entry>)session.getAttribute("PAGE_LIST");
     String word = (String)request.getAttribute("word");
@@ -21,7 +21,7 @@
 				dojo.byId('recientes').innerHTML=data; 
             }
         });
-		dojo.xhrPost({
+	dojo.xhrPost({
             url: '<%=pagesURL%>?p='+p,
             load: function(data) {
 				dojo.byId('pages').innerHTML=data; 
@@ -30,42 +30,41 @@
     }
 </script>
 <% if (!references.isEmpty()) {  %>
-	<div id="recientes" class="row">
-    <%  if (null == word) {  %>
-            <div><h2>Resultados para la búsqueda <%=word%></h2></div>
-	<%  }  %>
-<%      
-		for (Entry reference : references) {
-			String creator = "";
-			Title title = new Title();
+    <div id="references">
+        <div id="recientes" class="row">
+    <%      
+        for (Entry reference : references) {
+            String creator = "";
+            Title title = new Title();
             Identifier identifier = new Identifier();
             DigitalObject digital = new DigitalObject();
             List<Title> titles = reference.getTitle();
-			List<String> creators = reference.getCreator();
+            List<String> creators = reference.getCreator();
             List<DigitalObject> digitalobject = reference.getDigitalobject();
             List<Identifier> identifiers = reference.getIdentifier();
             if (!digitalobject.isEmpty()) digital = digitalobject.get(0);
-			if (!titles.isEmpty()) title = titles.get(0);
-			if (!creators.isEmpty()) creator = creators.get(0);
+            if (!titles.isEmpty()) title = titles.get(0);
+            if (!creators.isEmpty()) creator = creators.get(0);
             for (Identifier id : identifiers) {
                 if (id.isPreferred()) identifier = id;
             }
 %>	
-                <div class="pieza">
-                    <div>
-                        <a href="/swb/cultura/detalle?id=<%=identifier.getValue()%>">
-                            <img src="<%=digital.getUrl()%>" />
-                        </a>
-                    </div>
+            <div class="pieza">
+                <div>
+                    <a href="/swb/cultura/detalle?id=<%=identifier.getValue()%>">
+                        <img src="<%=digital.getUrl()%>" />
+                    </a>
+                </div>
                     <p class="oswB azul tit"><a href="#"><%=title.getValue()%></a></p>
                     <p class="azul autor"><a href="#"><%=creator%></a></p>
                 </div>
-<%      
-	}
-%>
-	</div>
+    <%      
+            }
+    %>
+        </div>
+        <jsp:include page="pager.jsp" flush="true"/>
+    </div>
 <%
     }else if (null != word) { out.println("No se encontraron resultados para la búsqueda " + word); }
-		else { out.println("Debe proporcionar un criterio de búsqueda"); }
+        else { out.println("Debe proporcionar un criterio de búsqueda"); }
 %>
-<jsp:include page="pager.jsp" flush="true"/>
