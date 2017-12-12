@@ -27,8 +27,8 @@ import org.semanticwb.portal.api.SWBResourceException;
  */
 public class PagerAction extends GenericResource {
     
-    protected int PAGE_NUM_ROW = 8;
-    protected int PAGE_JUMP_SIZE = 5;
+    protected int PAGE_NUM_ROW = 1;
+    protected int PAGE_JUMP_SIZE = 1;
     protected String PAGE_LIST = "PAGE_LIST";
     protected String FULL_LIST = "FULL_LIST";
     protected static final String MODE_PAGE = "PAGE";
@@ -92,6 +92,10 @@ public class PagerAction extends GenericResource {
 	session.setAttribute("PAGE_NUM_ROW", PAGE_NUM_ROW);
 	page(pagenum, session);
         String url = "/swbadmin/jsp/rnc/rows.jsp";
+        if (null != request.getParameter("m") && "l".equalsIgnoreCase(request.getParameter("m")))
+            request.setAttribute("mode", "row lista");
+        else request.setAttribute("mode", "row");
+        request.setAttribute("m",request.getParameter("m"));
     	RequestDispatcher rd = request.getRequestDispatcher(url);
     	try {
 	    rd.include(request, response);

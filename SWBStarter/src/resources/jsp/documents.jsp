@@ -13,18 +13,17 @@
     String word = (String)request.getAttribute("word");
 %>
 <script type="text/javascript">
-    function doPage(p) {
-		alert(p);
+	function setList() {
+		doPage(1, 'l');
+	}
+	function setGrid() {
+		doPage(1, 'g');
+	}
+    function doPage(p, m) {
         dojo.xhrPost({
-            url: '<%=pageURL%>?p='+p,
+            url: '<%=pageURL%>?p='+p+'&m='+m,
             load: function(data) {
-				dojo.byId('recientes').innerHTML=data; 
-            }
-        });
-	dojo.xhrPost({
-            url: '<%=pagesURL%>?p='+p,
-            load: function(data) {
-				dojo.byId('pages').innerHTML=data; 
+				dojo.byId('references').innerHTML=data; 
             }
         });
     }
@@ -48,7 +47,7 @@
             for (Identifier id : identifiers) {
                 if (id.isPreferred()) identifier = id;
             }
-%>	
+    %>	
             <div class="pieza">
                 <div>
                     <a href="/swb/cultura/detalle?id=<%=identifier.getValue()%>">
