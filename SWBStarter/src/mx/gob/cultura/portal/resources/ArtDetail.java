@@ -51,25 +51,39 @@ public class ArtDetail extends GenericAdmResource {
         String uri = getResourceBase().getAttribute("endpointURL","http://localhost:9200") + "/api/v1/search?identifier=";
         String JSPPath = "/swbadmin/jsp/rnc/artdetail.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(JSPPath);
-        try {
-            if (null != request.getParameter(IDENTIFIER)) {
-                uri += request.getParameter(IDENTIFIER);
-                URL url = new URL(uri);
-                //List<Entry> publicationList = new ArrayList<>();
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Accept", "application/json");
-                InputStream is = connection.getInputStream();
-                String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
-                Gson gson = new Gson();
-                //Type entryListType = new TypeToken<ArrayList<Entry>>(){}.getType();
-                //publicationList = gson.fromJson(jsonText, entryListType);
-                //if (!publicationList.isEmpty()) {
-                    entry = gson.fromJson(jsonText, Entry.class);//publicationList.get(0);
-                    request.setAttribute("entry", entry);
-                //}
+
+        if (null != request.getParameter(IDENTIFIER)) {
+            uri += request.getParameter(IDENTIFIER);
+            URL url = new URL(uri);
+
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+            InputStream is = connection.getInputStream();
+            String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
+            Gson gson = new Gson();
+
+            entry = gson.fromJson(jsonText, Entry.class);
+
+            if (null != entry) {
+                request.setAttribute("entry", entry);
+
+                //Update object view count
+                uri = getResourceBase().getAttribute("endpointURL","http://localhost:9200")
+                        + "/api/v1/search/hits/"
+                        + entry.getId();
+
+                url = new URL(uri);
+                connection = (HttpURLConnection)url.openConnection();
+                connection.setDoOutput(true);
+                connection.setRequestMethod("POST");
+                connection.getOutputStream().close();
             }
-            request.setAttribute("paramRequest", paramRequest);
+        }
+
+        request.setAttribute("paramRequest", paramRequest);
+
+        try {
             rd.include(request, response);
         } catch (ServletException se) {
             se.printStackTrace();
