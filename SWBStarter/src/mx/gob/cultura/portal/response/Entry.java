@@ -16,7 +16,7 @@ public class Entry implements Serializable {
     private static final long serialVersionUID = 7680915584896844702L;
 
     private String _id;
-    private List<Title> title;
+    private List<Title> recordtitle;
     private String holder;
     private String catchall;
     private String description;
@@ -133,12 +133,12 @@ public class Entry implements Serializable {
         this.identifier = identifier;
     }
 
-    public List<Title> getTitle() {
-        return title;
+    public List<Title> getRecordtitle() {
+        return recordtitle;
     }
 
-    public void setTitle(List<Title> title) {
-        this.title = title;
+    public void setRecordtitle(List<Title> recordtitle) {
+        this.recordtitle = recordtitle;
     }
 
     public String getDescription() {

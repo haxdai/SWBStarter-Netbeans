@@ -7,7 +7,7 @@
 	int paginaInicialBloque = 0;
 	int primerRegistroMostrado = 0;
 	int ultimoRegistroMostrado = 0;
-        Integer totalPages = (Integer)session.getAttribute("TOTAL_PAGES");
+    Integer totalPages = (Integer)session.getAttribute("TOTAL_PAGES");
 	Integer numPageList = (Integer)session.getAttribute("NUM_PAGE_LIST");
 	Integer pageJumpSize = (Integer)session.getAttribute("NUM_PAGE_JUMP");
 	Integer numRecordsTotal = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
@@ -17,7 +17,7 @@
 	Integer registrosPorPagina = (Integer)session.getAttribute("NUM_RECORDS_VISIBLE");
 	Integer totalRegistros = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
 	if (null == paginaActual) paginaActual = 1;
-        List<Entry> references = (List<Entry>)session.getAttribute("PAGE_LIST");
+    List<Entry> references = (List<Entry>)session.getAttribute("PAGE_LIST");
 	if (paginaActual != 0 && totalPaginas !=0 && totalRegistros != 0 && registrosPorPagina != 0 && totalRegistros != 0) {
 		numBloque = (paginaActual-1)/paginasPorBloque - (paginaActual-1)%paginasPorBloque/paginasPorBloque;
 		ultimoBloque = (totalPaginas-1)/paginasPorBloque - (totalPaginas-1)%paginasPorBloque/paginasPorBloque;
@@ -34,7 +34,7 @@
 	}
 	String m = null != request.getAttribute("m") ? (String)request.getAttribute("m") : "g";
 %>
-    <div id="pages" class="container paginacion">
+<div id="pages" class="container paginacion">
 	<ul class="azul">
 		<!-- liga para saltar al bloque anterior -->
 	<% 

@@ -28,34 +28,36 @@
         });
     }
 </script>
-<% if (!references.isEmpty()) {  %>
+<% if (!references.isEmpty()) { %>
     <div id="references">
         <div id="recientes" class="row">
     <%      
         for (Entry reference : references) {
             String creator = "";
             Title title = new Title();
-            Identifier identifier = new Identifier();
+            //Identifier identifier = new Identifier();
             DigitalObject digital = new DigitalObject();
-            List<Title> titles = reference.getTitle();
+            List<Title> titles = reference.getRecordtitle();
             List<String> creators = reference.getCreator();
             List<DigitalObject> digitalobject = reference.getDigitalobject();
             List<Identifier> identifiers = reference.getIdentifier();
+
             if (!digitalobject.isEmpty()) digital = digitalobject.get(0);
             if (!titles.isEmpty()) title = titles.get(0);
             if (!creators.isEmpty()) creator = creators.get(0);
-            for (Identifier id : identifiers) {
-                if (id.isPreferred()) identifier = id;
-            }
-    %>	
+            //for (Identifier id : identifiers) {
+            //    if (id.isPreferred()) identifier = id;
+            //}
+            String identifier = reference.getId();
+%>	
             <div class="pieza">
                 <div>
-                    <a href="/swb/cultura/detalle?id=<%=identifier.getValue()%>">
+                    <a href="/swb/cultura/detalle?id=<%=identifier%>">
                         <img src="<%=digital.getUrl()%>" />
                     </a>
                 </div>
-                    <p class="oswB azul tit"><a href="#"><%=title.getValue()%></a></p>
-                    <p class="azul autor"><a href="#"><%=creator%></a></p>
+                    <p class="oswB azul tit"><a href="/swb/cultura/detalle?id=<%=identifier%>"><%=title.getValue()%></a></p>
+                    <p class="azul autor"><a href="/swb/cultura/detalle?id=<%=identifier%>"><%=creator%></a></p>
                 </div>
     <%      
             }

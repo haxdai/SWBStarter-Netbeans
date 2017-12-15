@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mx.infotec.semanticwebbuilder.resources;
+package mx.gob.cultura.portal.resources;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -48,31 +48,31 @@ public class ArtDetail extends GenericAdmResource {
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, IOException {
         Entry entry = null;
-        String uri = getResourceBase().getAttribute("endpointURL","http://localhost:8080") + "/api/v1/search?identifier=";
+        String uri = getResourceBase().getAttribute("endpointURL","http://localhost:9200") + "/api/v1/search?identifier=";
         String JSPPath = "/swbadmin/jsp/rnc/artdetail.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(JSPPath);
         try {
             if (null != request.getParameter(IDENTIFIER)) {
                 uri += request.getParameter(IDENTIFIER);
                 URL url = new URL(uri);
-                List<Entry> publicationList = new ArrayList<>();
+                //List<Entry> publicationList = new ArrayList<>();
                 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("Accept", "application/json");
                 InputStream is = connection.getInputStream();
-                String jsonText = SWBUtils.IO.readInputStream(is);
+                String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
                 Gson gson = new Gson();
-                Type entryListType = new TypeToken<ArrayList<Entry>>(){}.getType();
-                publicationList = gson.fromJson(jsonText, entryListType);
-                if (!publicationList.isEmpty()) {
-                    entry = publicationList.get(0);
-                    System.out.println(entry);
+                //Type entryListType = new TypeToken<ArrayList<Entry>>(){}.getType();
+                //publicationList = gson.fromJson(jsonText, entryListType);
+                //if (!publicationList.isEmpty()) {
+                    entry = gson.fromJson(jsonText, Entry.class);//publicationList.get(0);
                     request.setAttribute("entry", entry);
-                }
+                //}
             }
             request.setAttribute("paramRequest", paramRequest);
             rd.include(request, response);
         } catch (ServletException se) {
+            se.printStackTrace();
             LOG.info(se.getMessage());
         }
     }
@@ -101,7 +101,7 @@ public class ArtDetail extends GenericAdmResource {
         title.setValue("Piedra del Sol");
         List<Title> titles = new ArrayList<>();
         titles.add(title);
-        entry.setTitle(titles);
+        entry.setRecordtitle(titles);
         DateDocument pdatecreated = new DateDocument();
         pdatecreated.setValue("Desconocido, Posclásico tardío (1250-1521 d.C.)");
         Period periodcreated = new Period();

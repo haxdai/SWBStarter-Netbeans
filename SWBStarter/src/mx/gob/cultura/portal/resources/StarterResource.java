@@ -1,4 +1,4 @@
-package mx.infotec.semanticwebbuilder.resources;
+package mx.gob.cultura.portal.resources;
 
 import java.io.IOException;
 import java.io.PrintWriter;

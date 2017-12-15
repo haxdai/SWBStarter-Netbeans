@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mx.infotec.semanticwebbuilder.resources;
+package mx.gob.cultura.portal.resources;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
-import mx.gob.cultura.portal.response.Entry;
+
+import mx.gob.cultura.portal.response.*;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import mx.gob.cultura.portal.response.DigitalObject;
-import mx.gob.cultura.portal.response.Identifier;
-import mx.gob.cultura.portal.response.Title;
+
 import org.semanticwb.SWBUtils;
 
 import org.semanticwb.portal.api.SWBParamRequest;
@@ -132,6 +132,7 @@ public class SearchCulturalProperty extends PagerAction {
             //paramRequest.getArguments().put("references", references);
 	    rd.include(request, response);
 	}catch (ServletException se) {
+    	    se.printStackTrace();
             LOG.info(se.getMessage());
 	}
     }
@@ -142,7 +143,7 @@ public class SearchCulturalProperty extends PagerAction {
             for (Entry reference : references) {
                 Identifier identifier = new Identifier();
                 DigitalObject digital = new DigitalObject();
-                List<Title> titles = reference.getTitle();
+                List<Title> titles = reference.getRecordtitle();
                 List<DigitalObject> digitalobject = reference.getDigitalobject();
                 List<Identifier> identifiers = reference.getIdentifier();
                 if (!digitalobject.isEmpty()) digital = digitalobject.get(0);
@@ -173,13 +174,15 @@ public class SearchCulturalProperty extends PagerAction {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
             InputStream is = connection.getInputStream();
-            String jsonText = SWBUtils.IO.readInputStream(is);
+            String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
             Gson gson = new Gson();
             Type entryListType = new TypeToken<ArrayList<Entry>>(){}.getType();
             if (null != request.getSession().getAttribute(FULL_LIST))
                     publicationList = (List<Entry>)request.getSession().getAttribute(FULL_LIST);
-            else
-                publicationList = gson.fromJson(jsonText, entryListType);
+            else{
+                SearchResponse resp = gson.fromJson(jsonText, SearchResponse.class);
+                publicationList = resp.getRecords();
+            }
     	}catch (Exception e) {
             e.printStackTrace();
             publicationList = new ArrayList<>();
