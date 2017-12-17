@@ -4,9 +4,9 @@
     Author     : sergio.tellez
 --%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@page import="org.semanticwb.portal.api.SWBResourceURL"%>
-<%@page import="org.semanticwb.portal.api.SWBParamRequest"%>
-<%@page import="java.util.List, mx.gob.cultura.portal.response.Entry, mx.gob.cultura.portal.response.DigitalObject, mx.gob.cultura.portal.response.Rights"%>
+<%@page import="mx.gob.cultura.portal.response.DigitalObject"%>
+<%@page import="mx.gob.cultura.portal.response.Entry"%>
+<%@page import="org.semanticwb.portal.api.SWBParamRequest, java.util.List"%>
 <%
 	int index = 0;
 	List<DigitalObject> digitalobjects = null;

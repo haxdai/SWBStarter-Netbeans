@@ -14,7 +14,6 @@ import java.io.Serializable;
 public class Rights  implements Serializable {
 
     private static final long serialVersionUID = 5428656041865451107L;
-    
     private String url;
     private String title;
     private String holder;

@@ -15,7 +15,6 @@ import java.util.Date;
 public class DateDocument implements Serializable {
 
     private static final long serialVersionUID = 5823180062173479772L;
-    
     private String value;
     private String format;
     private Date datevalue;

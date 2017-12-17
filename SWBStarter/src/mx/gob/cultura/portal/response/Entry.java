@@ -5,34 +5,32 @@
  */
 package mx.gob.cultura.portal.response;
 
-import java.util.List;
 import java.io.Serializable;
+import java.util.List;
 /**
  *
  * @author sergio.tellez
  */
 public class Entry implements Serializable {
-
     private static final long serialVersionUID = 7680915584896844702L;
-
     private String _id;
     private List<Title> recordtitle;
     private String holder;
     private String catchall;
     private String description;
-    
-    private List<String> type;
+
+    private List<String> resourcetype;
     private List<Rights> rights;
     private List<String> creator;
     private Period periodcreated;
     private List<Identifier> identifier;
     private List<DigitalObject> digitalobject;
     private DateDocument datecreated;
-    
+
     private String technique;
     private String collection;
     private String institution;
-    
+
     public Entry() {
         init();
     }
@@ -41,24 +39,24 @@ public class Entry implements Serializable {
         return technique;
     }
 
+    public void setTechnique(String technique) {
+        this.technique = technique;
+    }
+
     public String getInstitution() {
         return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     public String getCollection() {
         return collection;
     }
 
-    public void setTechnique(String technique) {
-        this.technique = technique;
-    }
-
     public void setCollection(String collection) {
         this.collection = collection;
-    }
-
-    public void setInstitution(String institution) {
-        this.institution = institution;
     }
 
     public String getId() {
@@ -69,12 +67,12 @@ public class Entry implements Serializable {
         this._id = _id;
     }
 
-    public List<String> getType() {
-        return type;
+    public List<String> getResourcetype() {
+        return resourcetype;
     }
 
-    public void setType(List<String> type) {
-        this.type = type;
+    public void setResourcetype(List<String> type) {
+        this.resourcetype = type;
     }
 
     public List<Rights> getRights() {
@@ -156,7 +154,7 @@ public class Entry implements Serializable {
     public void setDigitalobject(List<DigitalObject> digitalobject) {
         this.digitalobject = digitalobject;
     }
-    
+
     private void init() {
         DateDocument date = new DateDocument();
         date.setValue("");

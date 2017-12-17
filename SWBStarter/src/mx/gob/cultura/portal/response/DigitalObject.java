@@ -5,17 +5,15 @@
  */
 package mx.gob.cultura.portal.response;
 
-import java.util.List;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
  * @author sergio.tellez
  */
 public class DigitalObject implements Serializable {
-
     private static final long serialVersionUID = -6559537162627861962L;
-    
     private String url;
     private MediaType mediatype;
     private List<Rights> rights;
@@ -35,7 +33,7 @@ public class DigitalObject implements Serializable {
     public void setMediatype(MediaType mediatype) {
         this.mediatype = mediatype;
     }
-    
+
     public List<Rights> getRights() {
         return rights;
     }

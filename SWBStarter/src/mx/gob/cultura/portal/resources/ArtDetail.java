@@ -6,48 +6,36 @@
 package mx.gob.cultura.portal.resources;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.util.logging.Logger;
+import mx.gob.cultura.portal.response.*;
+import org.semanticwb.SWBUtils;
+import org.semanticwb.portal.api.GenericAdmResource;
+import org.semanticwb.portal.api.SWBParamRequest;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import mx.gob.cultura.portal.response.DateDocument;
-import mx.gob.cultura.portal.response.DigitalObject;
-import mx.gob.cultura.portal.response.Entry;
-import mx.gob.cultura.portal.response.Identifier;
-import mx.gob.cultura.portal.response.Period;
-import mx.gob.cultura.portal.response.Rights;
-import mx.gob.cultura.portal.response.Title;
-import org.semanticwb.SWBUtils;
-
-import org.semanticwb.portal.api.SWBParamRequest;
-import org.semanticwb.portal.api.SWBResourceException;
-
-import org.semanticwb.portal.api.GenericAdmResource;
+import java.util.logging.Logger;
 
 /**
  *
  * @author sergio.tellez
  */
 public class ArtDetail extends GenericAdmResource {
-    
+
     private static final String IDENTIFIER = "id";
     private static final Logger LOG = Logger.getLogger(ArtDetail.class.getName());
-    
+
     @Override
-    public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, IOException {
-        Entry entry = null;
+    public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws IOException {
+        Entry entry;
         String uri = getResourceBase().getAttribute("endpointURL","http://localhost:9200") + "/api/v1/search?identifier=";
         String JSPPath = "/swbadmin/jsp/rnc/artdetail.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(JSPPath);
@@ -78,6 +66,7 @@ public class ArtDetail extends GenericAdmResource {
                 connection.setDoOutput(true);
                 connection.setRequestMethod("POST");
                 connection.getOutputStream().close();
+                int code = connection.getResponseCode();
             }
         }
 
@@ -90,7 +79,7 @@ public class ArtDetail extends GenericAdmResource {
             LOG.info(se.getMessage());
         }
     }
-    
+
     private String testJson() {
         Entry entry = new Entry();
         Identifier identifier = new Identifier();
@@ -127,13 +116,12 @@ public class ArtDetail extends GenericAdmResource {
         List<String> creator = new ArrayList<>();
         creator.add("Lorem Ipsum Dolor");
         entry.setCreator(creator);
-        
+
         entry.setCollection("Lorem Ipsum Dolor");
         entry.setInstitution("INBA");
         entry.setDescription("Monumento colosal con la imagen labrada del disco solar representado como una sucesión de anillos concéntricos con diferentes elementos. En su centro se encuentra el glifo ?4 movimiento? (nahui ollin), que rodea el rostro de una deidad solar. El siguiente anillo contiene los 20 signos de los días; alrededor de éste se encuentra otro anillo, labrado con cuadretes que simbolizan los 52 años de un siglo mexica. Dos grandes serpientes de turquesa o xiuhcóatl envuelven todos estos elementos y unen su cabeza en la parte inferior del monolito.");
         entry.setTechnique("Lorem Ipsum Dolor");
         Gson gson = new Gson();
-        String json = gson.toJson(entry); 
-        return json;
+        return gson.toJson(entry);
     }
 }

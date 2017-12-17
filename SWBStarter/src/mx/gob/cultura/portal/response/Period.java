@@ -14,10 +14,18 @@ import java.io.Serializable;
 public class Period implements Serializable {
 
     private static final long serialVersionUID = 2553986509134716648L;
-    
     private DateDocument dateend;
     private DateDocument datestart;
     private String format;
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public DateDocument getDateend() {
         return dateend;

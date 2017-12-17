@@ -4,9 +4,9 @@
     Author     : sergio.tellez
 --%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@page import="org.semanticwb.portal.api.SWBResourceURL"%>
-<%@page import="org.semanticwb.portal.api.SWBParamRequest"%>
-<%@page import="java.util.List, mx.gob.cultura.portal.response.Entry, mx.gob.cultura.portal.response.DigitalObject, mx.gob.cultura.portal.response.Rights"%>
+<%@page import="mx.gob.cultura.portal.response.DigitalObject"%>
+<%@page import="mx.gob.cultura.portal.response.Entry"%>
+<%@page import="org.semanticwb.portal.api.SWBParamRequest, java.util.Iterator, java.util.List"%>
 <%
 	int index = 0;
     SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
@@ -56,7 +56,7 @@
 								<%	
 										} 
 								%>
-												<img src="<%=r.getUrl()%>" alt="siguiente"></img>
+												<img src="<%=r.getUrl()%>" style="max-width: 581px; max-height: 476px;" alt="siguiente" class="img-responsive"></img>
 											</div>
 								<% 
 										index++;
@@ -85,13 +85,36 @@
                 <p>Ficha técnica</p>
                 <hr>
                 <ul>
-                    <li><strong>Tipo de objeto</strong> <%=entry.getIdentifier().get(0).getType()%></li>
-                    <li><strong>Autor</strong> <%=entry.getCreator().get(0)%></li>
+					<%
+						String type = "";
+						Iterator<String> it = entry.getResourcetype().iterator();
+						while (it.hasNext()) {
+						    String t = it.next();
+						    type += t;
+						    if (it.hasNext()) {
+						        type += ", ";
+							}
+						}
+
+						String createdDate = "";
+						if (null != entry.getDatecreated()) {
+						    createdDate = entry.getDatecreated().getValue();
+                        } else if (null != entry.getPeriodcreated()) {
+                            createdDate = entry.getPeriodcreated().getName();
+                        }
+
+                        String creator = "";
+						if (null != entry.getCreator() && !entry.getCreator().isEmpty()) {
+						    creator = entry.getCreator().get(0);
+                        }
+					%>
+                    <li><strong>Tipo de objeto</strong> <%=type%></li>
+                    <li><strong>Autor</strong> <%=creator%></li>
                     <li><strong>Título</strong> <%=entry.getRecordtitle().get(0).getValue()%></li>
-                    <li><strong>Fecha de creación</strong> <%=entry.getDatecreated().getValue()%></li>
-                    <!--li><strong>Técnica</strong> <%=entry.getTechnique()%></li>
-                    <li><strong>Institución</strong> <%=entry.getInstitution()%></li>
-                    <li><strong>Fondo o colección</strong> <%=entry.getCollection()%></li-->
+                    <li><strong>Fecha de creación</strong> <%=createdDate%></li>
+                    <!--li><strong>Técnica</strong> <%=entry.getTechnique()%></li-->
+                    <li><strong>Institución</strong> <%=entry.getHolder()%></li>
+                    <!--li><strong>Fondo o colección</strong> <%=entry.getCollection()%></li-->
                     <li><strong>Identificador</strong> <%=entry.getIdentifier().get(0).getValue()%></li>
                 </ul>
             </div>
@@ -104,7 +127,7 @@
         <div class="col-xs-12 col-sm-7 col-md-6 col-lg-6 col-xl-6 offset-sm-0 offset-md-0 offset-lg-0 offset-xl-1">
 			<a href="#detallesube" id="subir"><i class="fa fa-long-arrow-down rojo-bg" aria-hidden="true"></i></a>
             <p class="oswB"><%=entry.getRecordtitle().get(0).getValue()%></p>
-            <p><%=entry.getPeriodcreated().getDatestart().getValue()%></p>
+            <p><%=createdDate%></p>
         </div>
         <div class="col-xs-12 col-sm-2 col-md-3 col-lg-3 col-xl-2">
             <a href="#"><i class="fa fa-search-plus" aria-hidden="true"></i></a>

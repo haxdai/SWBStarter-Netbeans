@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@page import="org.semanticwb.portal.api.SWBResourceURL"%>
-<%@page import="org.semanticwb.portal.api.SWBParamRequest"%>
-<%@page import="java.util.List,mx.gob.cultura.portal.response.Entry, mx.gob.cultura.portal.response.Identifier, mx.gob.cultura.portal.response.DigitalObject, mx.gob.cultura.portal.response.Title"%>
+<%@page import="mx.gob.cultura.portal.response.DigitalObject"%>
+<%@page import="mx.gob.cultura.portal.response.Entry"%>
+<%@page import="mx.gob.cultura.portal.response.Identifier,mx.gob.cultura.portal.response.Title, org.semanticwb.portal.api.SWBParamRequest, org.semanticwb.portal.api.SWBResourceURL, java.util.List"%>
 <script type="text/javascript" src="/swbadmin/js/dojo/dojo/dojo.js" djConfig="parseOnLoad: true, isDebug: false, locale: 'en'" ></script>
 <%
     SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");

@@ -14,7 +14,6 @@ import java.io.Serializable;
 public class Title implements Serializable {
 
     private static final long serialVersionUID = -8547338812629695690L;
-    
     private String type;
     private String value;
 

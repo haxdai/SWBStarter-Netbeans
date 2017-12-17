@@ -12,12 +12,10 @@ import java.io.Serializable;
  * @author sergio.tellez
  */
 public class Identifier implements Serializable {
-
     private static final long serialVersionUID = 5541337472802206271L;
-    
     private String type;
     private String value;
-    private boolean preferred; 
+    private boolean preferred;
 
     public String getType() {
         return type;
