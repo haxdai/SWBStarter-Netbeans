@@ -48,27 +48,22 @@ public class ArtDetail extends GenericAdmResource {
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, IOException {
         Entry entry = null;
-        String uri = getResourceBase().getAttribute("endpointURL","http://localhost:8080") + "/api/v1/search?identifier=";
+        String uri = getResourceBase().getAttribute("url","http://localhost:8080") + "/api/v1/search?identifier=";
         String JSPPath = "/swbadmin/jsp/rnc/artdetail.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(JSPPath);
         try {
             if (null != request.getParameter(IDENTIFIER)) {
                 uri += request.getParameter(IDENTIFIER);
                 URL url = new URL(uri);
-                List<Entry> publicationList = new ArrayList<>();
                 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("Accept", "application/json");
                 InputStream is = connection.getInputStream();
                 String jsonText = SWBUtils.IO.readInputStream(is);
                 Gson gson = new Gson();
-                Type entryListType = new TypeToken<ArrayList<Entry>>(){}.getType();
-                publicationList = gson.fromJson(jsonText, entryListType);
-                if (!publicationList.isEmpty()) {
-                    entry = publicationList.get(0);
-                    System.out.println(entry);
-                    request.setAttribute("entry", entry);
-                }
+                Type entryType = new TypeToken<Entry>(){}.getType();
+                entry = gson.fromJson(jsonText, entryType);
+                request.setAttribute("entry", entry);
             }
             request.setAttribute("paramRequest", paramRequest);
             rd.include(request, response);
@@ -101,7 +96,6 @@ public class ArtDetail extends GenericAdmResource {
         title.setValue("Piedra del Sol");
         List<Title> titles = new ArrayList<>();
         titles.add(title);
-        entry.setTitle(titles);
         DateDocument pdatecreated = new DateDocument();
         pdatecreated.setValue("Desconocido, Posclásico tardío (1250-1521 d.C.)");
         Period periodcreated = new Period();
@@ -114,10 +108,7 @@ public class ArtDetail extends GenericAdmResource {
         creator.add("Lorem Ipsum Dolor");
         entry.setCreator(creator);
         
-        entry.setCollection("Lorem Ipsum Dolor");
-        entry.setInstitution("INBA");
         entry.setDescription("Monumento colosal con la imagen labrada del disco solar representado como una sucesión de anillos concéntricos con diferentes elementos. En su centro se encuentra el glifo ?4 movimiento? (nahui ollin), que rodea el rostro de una deidad solar. El siguiente anillo contiene los 20 signos de los días; alrededor de éste se encuentra otro anillo, labrado con cuadretes que simbolizan los 52 años de un siglo mexica. Dos grandes serpientes de turquesa o xiuhcóatl envuelven todos estos elementos y unen su cabeza en la parte inferior del monolito.");
-        entry.setTechnique("Lorem Ipsum Dolor");
         Gson gson = new Gson();
         String json = gson.toJson(entry); 
         return json;

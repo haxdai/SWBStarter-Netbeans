@@ -16,49 +16,45 @@ public class Entry implements Serializable {
     private static final long serialVersionUID = 7680915584896844702L;
 
     private String _id;
-    private List<Title> title;
     private String holder;
-    private String catchall;
     private String description;
     
-    private List<String> type;
+    private Stats resourcestats;
     private List<Rights> rights;
     private List<String> creator;
     private Period periodcreated;
+    private List<Title> recordtitle;
+    private DateDocument datecreated;
+    private List<String> resourcetype;
     private List<Identifier> identifier;
     private List<DigitalObject> digitalobject;
-    private DateDocument datecreated;
-    
-    private String technique;
-    private String collection;
-    private String institution;
+
+    public Stats getResourcestats() {
+        return resourcestats;
+    }
+
+    public void setResourcestats(Stats resourcestats) {
+        this.resourcestats = resourcestats;
+    }
+
+    public List<Title> getRecordtitle() {
+        return recordtitle;
+    }
+
+    public void setRecordtitle(List<Title> recordtitle) {
+        this.recordtitle = recordtitle;
+    }
+
+    public List<String> getResourcetype() {
+        return resourcetype;
+    }
+
+    public void setResourcetype(List<String> resourcetype) {
+        this.resourcetype = resourcetype;
+    }
     
     public Entry() {
         init();
-    }
-
-    public String getTechnique() {
-        return technique;
-    }
-
-    public String getInstitution() {
-        return institution;
-    }
-
-    public String getCollection() {
-        return collection;
-    }
-
-    public void setTechnique(String technique) {
-        this.technique = technique;
-    }
-
-    public void setCollection(String collection) {
-        this.collection = collection;
-    }
-
-    public void setInstitution(String institution) {
-        this.institution = institution;
     }
 
     public String getId() {
@@ -67,14 +63,6 @@ public class Entry implements Serializable {
 
     public void setId(String _id) {
         this._id = _id;
-    }
-
-    public List<String> getType() {
-        return type;
-    }
-
-    public void setType(List<String> type) {
-        this.type = type;
     }
 
     public List<Rights> getRights() {
@@ -117,28 +105,12 @@ public class Entry implements Serializable {
         this.holder = holder;
     }
 
-    public String getCatchall() {
-        return catchall;
-    }
-
-    public void setCatchall(String catchall) {
-        this.catchall = catchall;
-    }
-
     public List<Identifier> getIdentifier() {
         return identifier;
     }
 
     public void setIdentifier(List<Identifier> identifier) {
         this.identifier = identifier;
-    }
-
-    public List<Title> getTitle() {
-        return title;
-    }
-
-    public void setTitle(List<Title> title) {
-        this.title = title;
     }
 
     public String getDescription() {
@@ -160,13 +132,27 @@ public class Entry implements Serializable {
     private void init() {
         DateDocument date = new DateDocument();
         date.setValue("");
+        this.description = "";
+        this.datecreated = date;
         periodcreated = new Period();
         periodcreated.setDateend(date);
         periodcreated.setDatestart(date);
     }
+    
+    public String getIdentifiers() {
+        StringBuilder identifiers = new StringBuilder();
+        if (null != this.identifier) {
+            for (Identifier ide : this.identifier) {
+		identifiers.append(ide.getValue()).append("|");
+            }
+            if (identifiers.length() > 0)
+                identifiers.delete(identifiers.length()-1, identifiers.length());
+	}
+        return identifiers.toString();
+    }
 
     @Override
     public String toString() {
-        return "Entry{" + "datecreated=" + datecreated + '}';
+        return "Entry{" + "recordtitle=" + recordtitle + ", identifier=" + identifier + ", digitalobject=" + digitalobject + '}';
     }
 }

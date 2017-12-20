@@ -12,22 +12,20 @@
     <%      for (Entry reference : references) {
                 Identifier identifier = new Identifier();
                 DigitalObject digital = new DigitalObject();
-                List<Title> titles = reference.getTitle();
+                List<Title> titles = reference.getRecordtitle();
+				List<String> creators = reference.getCreator();
                 List<DigitalObject> digitalobject = reference.getDigitalobject();
-                List<Identifier> identifiers = reference.getIdentifier();
                 if (!digitalobject.isEmpty()) digital = digitalobject.get(0);
-                for (Identifier id : identifiers) {
-                    if (id.isPreferred()) identifier = id;
-                }
+				String creator = creators.size() > 0 ? creators.get(0) : "";
     %>	
                 <div class="pieza">
                     <div>
-                        <a href="/swb/cultura/detalle?id=<%=identifier.getValue()%>">
+                        <a href="/swb/cultura/detalle?id=<%=reference.getId()%>">
                             <img src="<%=digital.getUrl()%>" />
                         </a>
                     </div>
                     <p class="oswB azul tit"><a href="#"><%=titles.get(0).getValue()%></a></p>
-                    <p class="azul autor"><a href="#"><%=reference.getCreator().get(0)%></a></p>
+                    <p class="azul autor"><a href="#"><%=creator%></a></p>
                 </div>
     <%       
             }

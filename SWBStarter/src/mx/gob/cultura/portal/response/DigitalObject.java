@@ -17,7 +17,7 @@ public class DigitalObject implements Serializable {
     private static final long serialVersionUID = -6559537162627861962L;
     
     private String url;
-    private String format;
+    private MediaType mediatype;
     private List<Rights> rights;
 
     public String getUrl() {
@@ -27,14 +27,6 @@ public class DigitalObject implements Serializable {
     public void setUrl(String url) {
         this.url = url;
     }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
     
     public List<Rights> getRights() {
         return rights;
@@ -42,5 +34,13 @@ public class DigitalObject implements Serializable {
 
     public void setRights(List<Rights> rights) {
         this.rights = rights;
+    }
+    
+    public MediaType getMediatype() {
+        return mediatype;
+    }
+
+    public void setMediatype(MediaType mediatype) {
+        this.mediatype = mediatype;
     }
 }
