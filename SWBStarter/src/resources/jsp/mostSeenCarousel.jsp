@@ -32,7 +32,9 @@
             for (DigitalObject digObj : item.getDigitalobject()) {
                 if (digObj.getMediatype().getMime().startsWith("image") && !digObj.getUrl().isEmpty()) {
 %>
-                            <img class="card-img-top" src="<%=digObj.getUrl()%>"/>
+                            <div class="card-img-cont">
+                                <img class="card-img-top" src="<%=digObj.getUrl()%>"/>
+                            </div>
 <%
                     break;
                 }
