@@ -6,17 +6,27 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@page import="org.semanticwb.portal.api.SWBResourceURL"%>
 <%@page import="org.semanticwb.portal.api.SWBParamRequest"%>
-<%@page import="java.util.List, mx.gob.cultura.portal.response.Entry, mx.gob.cultura.portal.response.DigitalObject, mx.gob.cultura.portal.response.Rights,  mx.gob.cultura.portal.response.Title, mx.gob.cultura.portal.response.DateDocument"%>
+<%@page import="java.util.List, java.util.ArrayList, mx.gob.cultura.portal.response.Entry, mx.gob.cultura.portal.response.DigitalObject, mx.gob.cultura.portal.response.Rights,  mx.gob.cultura.portal.response.Title, mx.gob.cultura.portal.response.DateDocument"%>
 <%
-	int index = 0;
+    int index = 0;
+    String title = "";
+    String period = "";
+    String creator = "";
+    List<Title> titles = new ArrayList<>();
+    List<String> creators = new ArrayList<>();
+    DateDocument datestart = new DateDocument();
+    List<DigitalObject> digitalobjects = new ArrayList<>();
     SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
     Entry entry = (Entry)request.getAttribute("entry");
-	List<DigitalObject> digitalobjects = entry.getDigitalobject();
-	List<Title> titles = entry.getRecordtitle();
-	List<String> creators = entry.getCreator();
-	String creator = creators.size() > 0 ? creators.get(0) : "";
-	DateDocument datestart = entry.getPeriodcreated().getDatestart();
-	String period = null != datestart ? datestart.getValue() : "";
+    if (null != entry && null != entry.getDigitalobject()) {
+	creators = entry.getCreator();
+	titles = entry.getRecordtitle();
+	digitalobjects = entry.getDigitalobject();
+	datestart = entry.getPeriodcreated().getDatestart();
+	creator = creators.size() > 0 ? creators.get(0) : "";
+	period = null != datestart ? datestart.getValue() : "";
+	if (!titles.isEmpty()) title = titles.get(0).getValue();
+    }
 %>
 <main role="main" class="container-fluid detalle" id="detalle">
     <div class="row row-offcanvas row-offcanvas-right" id="detallecont">
@@ -66,7 +76,7 @@
 								<% 
 										index++;
 							}
-						} 
+						}
 					%>    
                 </div>
 				<%
@@ -87,14 +97,20 @@
         </div>
         <div class="col-6 col-md-3 sidebar-offcanvas" id="sidebar">
             <div>
-                <p>Ficha técnica</p><% System.out.println("start: " +  entry.getPeriodcreated().getDatestart()); %>
+                <p>Ficha técnica</p>
                 <hr>
                 <ul>
-                    <li><strong>Tipo de objeto</strong> <%=entry.getIdentifier().get(0).getType()%></li>
-                    <li><strong>Autor</strong> <%=creator%></li>
-                    <li><strong>Título</strong> <%=titles.get(0).getValue()%></li>
-                    <li><strong>Fecha de creación</strong> <%=entry.getDatecreated().getValue()%></li>
-                    <li><strong>Identificador</strong> <%=entry.getIdentifiers()%></li>
+					<% if (null != entry.getIdentifier()) { %>
+						<li><strong>Tipo de objeto</strong> <%=entry.getIdentifier().get(0).getType()%></li>
+						<li><strong>Autor</strong> <%=creator%></li>
+						<li><strong>Título</strong> <%=titles.get(0).getValue()%></li>
+						<li><strong>Fecha de creación</strong> <%=entry.getDatecreated().getValue()%></li>
+						<li><strong>Identificador</strong> <%=entry.getIdentifiers()%></li>
+					<% 
+						}else {
+							out.println("<li><strong>No se encontró información del objeto</strong></li>");
+						}
+					%>
                 </ul>
             </div>
             <div class="vermas">
@@ -105,7 +121,7 @@
     <div id="detallesube" class="row detalle-acciones ">
         <div class="col-xs-12 col-sm-7 col-md-6 col-lg-6 col-xl-6 offset-sm-0 offset-md-0 offset-lg-0 offset-xl-1">
 			<a href="#detallesube" id="subir"><i class="fa fa-long-arrow-down rojo-bg" aria-hidden="true"></i></a>
-            <p class="oswB"><%=titles.get(0).getValue()%></p>
+            <p class="oswB"><%=title%></p>
             <p><%=period%></p>
         </div>
         <div class="col-xs-12 col-sm-2 col-md-3 col-lg-3 col-xl-2">
@@ -119,13 +135,15 @@
         </div>
     </div>
 </main>
-<section id="detalleinfo">
-	<a></a>
-    <div class="cointainer-fluid">
-		<div class="row detalleinfo azul-bg">
-			<p class="col-md-10 offset-md-1">
-				<%=entry.getDescription()%>
-			</p>
+<% if (null != entry && null != entry.getDescription() && !entry.getDescription().isEmpty()) { %>
+	<section id="detalleinfo">
+		<a></a>
+		<div class="cointainer-fluid">
+			<div class="row detalleinfo azul-bg">
+				<p class="col-md-10 offset-md-1">
+					<%=entry.getDescription()%>
+				</p>
+			</div>
 		</div>
-	</div>
-</section>
+	</section>
+<% } %>

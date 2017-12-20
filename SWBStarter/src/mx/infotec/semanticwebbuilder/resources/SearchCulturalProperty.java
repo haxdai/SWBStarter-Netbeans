@@ -118,7 +118,7 @@ public class SearchCulturalProperty extends PagerAction {
     	RequestDispatcher rd = request.getRequestDispatcher(url);
     	try {
             if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
-    		document = getReference(request.getParameter("word"), request);
+    		document = getReference(request);
                 publicationList = getRange(getStart(request), document.getRecords());
                 request.setAttribute("aggs", document.getAggs());
     		request.setAttribute("count", document.getTotal());
@@ -134,10 +134,36 @@ public class SearchCulturalProperty extends PagerAction {
 	}
     }
     
-    private Document getReference(String words, HttpServletRequest request) {
+    @Override
+    public void doSort(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
+         List<Entry> publicationList = new ArrayList<>();
+        try {
+            if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
+    		Document document = getReference(request);
+                publicationList = getRange(getStart(request), document.getRecords());
+                request.setAttribute("word", request.getParameter("word"));
+                request.getSession().setAttribute(FULL_LIST, document.getRecords());
+                init(request, response, paramRequest);
+    	    }
+            request.setAttribute("references", publicationList);
+	    request.setAttribute("paramRequest", paramRequest);
+	}catch (Exception se) {
+            LOG.info(se.getMessage());
+	}
+        super.doSort(request, response, paramRequest);
+    }
+    
+    private Document getReference(HttpServletRequest request) {
         Document document = new Document();
+        String words = request.getParameter("word");
     	String uri = getResourceBase().getAttribute("endpointURL","http://localhost:8080") + "/api/v1/search?q=";
     	uri += getParamSearch(words);
+        if (null != request.getParameter("sort")) {
+            if (request.getParameter("sort").equalsIgnoreCase("datedes")) uri += "&sort=-datecreated.value";
+            if (request.getParameter("sort").equalsIgnoreCase("dateasc")) uri += "&sort=datecreated.value";
+            if (request.getParameter("sort").equalsIgnoreCase("statdes")) uri += "&sort=-resourcestats.views";
+            if (request.getParameter("sort").equalsIgnoreCase("statasc")) uri += "&sort=resourcestats.views";
+        }
     	try {
             URL url = new URL(uri);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();

@@ -34,6 +34,7 @@ public class PagerAction extends GenericResource {
     protected static final String MODE_PAGE = "PAGE";
     protected static final String MODE_PREV = "PREV";
     protected static final String MODE_NEXT = "NEXT";
+    protected static final String MODE_SORT = "SORT";
     protected static final String MODE_PAGES = "PAGES";
     protected static final String TOTAL_PAGES = "TOTAL_PAGES";
     protected static final String NUM_PAGE_JUMP = "NUM_PAGE_JUMP";
@@ -54,6 +55,8 @@ public class PagerAction extends GenericResource {
             doNext(request, response, paramRequest);
         }else if (MODE_PAGES.equals(mode)) {
             doPages(request, response, paramRequest);
+        }else if (MODE_SORT.equals(mode)) {
+            doSort(request, response, paramRequest);
         }else
             super.processRequest(request, response, paramRequest);
     }
@@ -96,6 +99,17 @@ public class PagerAction extends GenericResource {
             request.setAttribute("mode", "row lista");
         else request.setAttribute("mode", "row");
         request.setAttribute("m",request.getParameter("m"));
+    	RequestDispatcher rd = request.getRequestDispatcher(url);
+    	try {
+	    rd.include(request, response);
+	}catch (ServletException se) {
+            LOG.info(se.getMessage());
+	}
+    }
+    
+    public void doSort(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
+        String url = "/swbadmin/jsp/rnc/rows.jsp";
+        request.setAttribute("mode", "row");
     	RequestDispatcher rd = request.getRequestDispatcher(url);
     	try {
 	    rd.include(request, response);

@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@page import="org.semanticwb.portal.api.SWBResourceURL"%>
 <%@page import="org.semanticwb.portal.api.SWBParamRequest"%>
 <%@page import="java.util.List,java.util.ArrayList,mx.gob.cultura.portal.response.Aggregation, mx.gob.cultura.portal.response.CountName"%>
 <%
@@ -8,6 +9,9 @@
 	List<CountName> resourcetypes = new ArrayList<>();
 	String word = (String)request.getAttribute("word");
 	List<Aggregation> aggs = (List<Aggregation>)request.getAttribute("aggs");
+	SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
+    SWBResourceURL pageURL = paramRequest.getRenderUrl().setMode("SORT");
+    pageURL.setCallMethod(SWBParamRequest.Call_DIRECT);
 	if (null != aggs && null != word) {
 		showFilters = true;
 		for (Aggregation a : aggs) {
@@ -17,6 +21,16 @@
 		}
 	}
 %>
+<script type="text/javascript">
+    function doSort(w, f) {
+        dojo.xhrPost({
+            url: '<%=pageURL%>?word='+w+'&sort='+f,
+            load: function(data) {
+				dojo.byId('references').innerHTML=data;
+            }
+        });
+    }
+</script>
 	<div class="" id="sidebar">
         <div id="accordion" role="tablist">
 			<% if (!holders.isEmpty()) { %>
@@ -111,9 +125,9 @@
 						Ordenar por:
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-						<a class="dropdown-item" href="#">Fecha</a>
-						<a class="dropdown-item" href="#">Alfabeto</a>
-                        <a class="dropdown-item" href="#">Otro</a>
+						<a class="dropdown-item" href="#" onclick="javascript:doSort(<% out.print("'"+word+"','datedes'"); %>)">Fecha</a>
+						<a class="dropdown-item" href="#" onclick="javascript:doSort(<% out.print("'"+word+"','relvdes'"); %>)">Relevancia</a>
+						<a class="dropdown-item" href="#" onclick="javascript:doSort(<% out.print("'"+word+"','statdes'"); %>)">Popularidad</a>
                     </div>
                 </div>
                 <div class="col-lg-3">
