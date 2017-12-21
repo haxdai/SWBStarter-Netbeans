@@ -128,7 +128,7 @@ public class Entry implements Serializable {
     public void setDigitalobject(List<DigitalObject> digitalobject) {
         this.digitalobject = digitalobject;
     }
-    
+
     private void init() {
         DateDocument date = new DateDocument();
         date.setValue("");

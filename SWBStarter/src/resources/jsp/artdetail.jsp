@@ -1,4 +1,4 @@
-<%-- 
+<%--
     Document   : artdetail.jsp
     Created on : 5/12/2017, 11:48:36 AM
     Author     : sergio.tellez

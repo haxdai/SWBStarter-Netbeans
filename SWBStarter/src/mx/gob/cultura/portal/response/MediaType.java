@@ -14,9 +14,9 @@ import java.io.Serializable;
 public class MediaType implements Serializable {
 
     private static final long serialVersionUID = -6808742909214377954L;
-    
+
     private String mime;
-    
+
     private String name;
 
     public String getMime() {

@@ -107,7 +107,6 @@ public class ArtDetail extends GenericAdmResource {
         List<String> creator = new ArrayList<>();
         creator.add("Lorem Ipsum Dolor");
         entry.setCreator(creator);
-        
         entry.setDescription("Monumento colosal con la imagen labrada del disco solar representado como una sucesión de anillos concéntricos con diferentes elementos. En su centro se encuentra el glifo ?4 movimiento? (nahui ollin), que rodea el rostro de una deidad solar. El siguiente anillo contiene los 20 signos de los días; alrededor de éste se encuentra otro anillo, labrado con cuadretes que simbolizan los 52 años de un siglo mexica. Dos grandes serpientes de turquesa o xiuhcóatl envuelven todos estos elementos y unen su cabeza en la parte inferior del monolito.");
         Gson gson = new Gson();
         String json = gson.toJson(entry); 
