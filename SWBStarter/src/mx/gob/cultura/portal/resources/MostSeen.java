@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+
+import mx.gob.cultura.portal.response.Document;
 import org.semanticwb.portal.api.GenericResource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +64,7 @@ public class MostSeen extends GenericResource {
             String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
             Gson gson = new Gson();
             Type entryListType = new TypeToken<ArrayList<Entry>>(){}.getType();
-            SearchResponse resp = gson.fromJson(jsonText, SearchResponse.class);
+            Document resp = gson.fromJson(jsonText, Document.class);
             publicationList = resp.getRecords();
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,21 +1,23 @@
 package mx.gob.cultura.portal.resources;
 
 import com.google.gson.Gson;
+import mx.gob.cultura.portal.response.Document;
+import mx.gob.cultura.portal.response.Entry;
+import org.semanticwb.SWBUtils;
+import org.semanticwb.portal.api.GenericResource;
+import org.semanticwb.portal.api.SWBParamRequest;
+import org.semanticwb.portal.api.SWBResourceException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import mx.gob.cultura.portal.response.Entry;
-import org.semanticwb.SWBUtils;
-import org.semanticwb.portal.api.GenericResource;
-import org.semanticwb.portal.api.SWBParamRequest;
-import org.semanticwb.portal.api.SWBResourceException;
 
 /**
  * Muestra los n elementos recien agregados al repositorio
@@ -57,7 +59,7 @@ public class RecentlyAdded extends GenericResource {
             InputStream is = connection.getInputStream();
             String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
             Gson gson = new Gson();
-            SearchResponse resp = gson.fromJson(jsonText, SearchResponse.class);
+            Document resp = gson.fromJson(jsonText, Document.class);
             publicationList = resp.getRecords();
         } catch (Exception e) {
             e.printStackTrace(System.err);
