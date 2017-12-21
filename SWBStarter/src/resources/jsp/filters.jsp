@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@page import="org.semanticwb.portal.api.SWBResourceURL"%>
-<%@page import="org.semanticwb.portal.api.SWBParamRequest"%>
-<%@page import="java.util.List,java.util.ArrayList,mx.gob.cultura.portal.response.Aggregation, mx.gob.cultura.portal.response.CountName"%>
+<%@page import="mx.gob.cultura.portal.response.Aggregation"%>
+<%@page import="mx.gob.cultura.portal.response.CountName"%>
+<%@page import="org.semanticwb.portal.api.SWBParamRequest,org.semanticwb.portal.api.SWBResourceURL,java.util.ArrayList, java.util.List"%>
 <%
 	boolean showFilters = false;
 	List<CountName> dates = new ArrayList<>();
@@ -114,7 +114,7 @@
 	<div class="" id="contenido">
         <div class="ruta oswL">
 			<a href="javascript:history.go(-1)" class="rojo"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> Regresar</a> | 
-             | Inicio / Resultados de la búsqueda
+			Inicio / Resultados de la búsqueda
         </div>
         <div class="ordenar">
 			<div class="row">
