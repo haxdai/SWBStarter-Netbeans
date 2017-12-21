@@ -59,10 +59,24 @@ public class ArtDetail extends GenericAdmResource {
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("Accept", "application/json");
                 InputStream is = connection.getInputStream();
-                String jsonText = SWBUtils.IO.readInputStream(is);
+                String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
                 Gson gson = new Gson();
                 Type entryType = new TypeToken<Entry>(){}.getType();
                 entry = gson.fromJson(jsonText, entryType);
+
+                if (null != entry) {
+                    uri = getResourceBase().getAttribute("url","http://localhost:8080")
+                            + "/api/v1/search/hits/"
+                            + entry.getId();
+
+                    url = new URL(uri);
+                    connection = (HttpURLConnection)url.openConnection();
+                    connection.setDoOutput(true);
+                    connection.setRequestMethod("POST");
+                    connection.getOutputStream().close();
+                    connection.getResponseCode();
+                }
+
                 request.setAttribute("entry", entry);
             }
             request.setAttribute("paramRequest", paramRequest);

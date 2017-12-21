@@ -170,7 +170,7 @@ public class SearchCulturalProperty extends PagerAction {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
             InputStream is = connection.getInputStream();
-            String jsonText = SWBUtils.IO.readInputStream(is);
+            String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
             Gson gson = new Gson();
             Type documentType = new TypeToken<Document>(){}.getType();
             document = gson.fromJson(jsonText, documentType);

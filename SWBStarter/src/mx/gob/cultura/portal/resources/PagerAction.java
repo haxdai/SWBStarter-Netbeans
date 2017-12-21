@@ -85,6 +85,7 @@ public class PagerAction extends GenericResource {
     }
     
     public void doPage(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
+        response.setCharacterEncoding("UTF-8");
         int pagenum = 0;
         HttpSession session = request.getSession();
         String p = request.getParameter("p");
