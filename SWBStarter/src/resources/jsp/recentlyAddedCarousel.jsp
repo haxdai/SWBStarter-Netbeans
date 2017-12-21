@@ -38,7 +38,7 @@
             for (DigitalObject digObj : item.getDigitalobject()) {
                 if (digObj.getMediatype().getMime().startsWith("image") && !digObj.getUrl().isEmpty()) {
 %>
-                            <a href="/swb/repositorio/detalle?id=<%=preferredId.getValue()%>">
+                            <a href="/swb/cultura/detalle?id=<%=item.getId()%>">
                               <img src="<%=digObj.getUrl()%>"/>
                             </a>
 <%
@@ -49,10 +49,10 @@
 %>
                           </div>
                           <p class="oswB azul tit ">
-                            <a href="/swb/repositorio/detalle?id=<%=preferredId.getValue()%>"><%=item.getRecordtitle().get(0).getValue()%></a>
+                            <a href="/swb/cultura/detalle?id=<%=item.getId()%>"><%=item.getRecordtitle().get(0).getValue()%></a>
                           </p>
                           <p class="azul autor">
-                            <a href="/swb/repositorio/detalle?id=<%=preferredId.getValue()%>"><%=creator%></a>
+                            <a href="/swb/cultura/detalle?id=<%=item.getId()%>"><%=creator%></a>
                           </p>
                         </div>
                       </div>

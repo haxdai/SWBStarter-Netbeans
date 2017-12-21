@@ -56,7 +56,7 @@
                                     <div>
                                         <span class="ion-eye"/> <%=views%>
                                     </div>
-                                    <div><a class="rojo" href="/swb/cultura/detalle?id=<%=preferredId.getValue()%>">Ver más +</a></div>
+                                    <div><a class="rojo" href="/swb/cultura/detalle?id=<%=item.getId()%>">Ver más +</a></div>
                                 </small>
                             </div>
                         </div>
