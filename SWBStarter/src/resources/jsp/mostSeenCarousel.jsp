@@ -45,7 +45,7 @@
                     preferredId = id;
                 }
             }
-            int views = 0; //item.getResourcestats().getViews();
+            int views = item.getResourcestats().getViews(); //item.getResourcestats().getViews();
 %>
                             <div class="card-body">
                                 <h4 class="card-title"><%=item.getRecordtitle().get(0).getValue()%></h4>
