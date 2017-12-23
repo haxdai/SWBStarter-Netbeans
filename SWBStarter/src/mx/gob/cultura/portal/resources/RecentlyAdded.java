@@ -24,15 +24,12 @@ import java.util.logging.Logger;
  * @author jose.jimenez
  */
 public class RecentlyAdded extends GenericResource {
-    
-    
     private static final Logger LOG = Logger.getLogger(MostSeen.class.getName());
-    
-    
+
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response,
-            SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
-        
+                       SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
+
         List<Entry> references;
         //List<Entry> publicationList = new ArrayList<>();
         String url = "/swbadmin/jsp/rnc/recentlyAddedCarousel.jsp";
@@ -47,7 +44,7 @@ public class RecentlyAdded extends GenericResource {
             LOG.info(se.getMessage());
         }
     }
-    
+
     private List<Entry> getReferences(HttpServletRequest request) {
         String uri = getResourceBase().getAttribute("endpointURL", "https://search.innovatic.com.mx") + "/api/v1/search?sort=-indexcreated&size=10";
         List<Entry> publicationList = new ArrayList<>();

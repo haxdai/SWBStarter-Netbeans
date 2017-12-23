@@ -61,9 +61,7 @@ public class ArtDetail extends GenericAdmResource {
                 InputStream is = connection.getInputStream();
                 String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
                 Gson gson = new Gson();
-                Type entryType = new TypeToken<Entry>(){}.getType();
-                entry = gson.fromJson(jsonText, entryType);
-
+                entry = gson.fromJson(jsonText, Entry.class);
                 if (null != entry) {
                     uri = getResourceBase().getAttribute("url","http://localhost:8080")
                             + "/api/v1/search/hits/"
@@ -82,6 +80,7 @@ public class ArtDetail extends GenericAdmResource {
             request.setAttribute("paramRequest", paramRequest);
             rd.include(request, response);
         } catch (ServletException se) {
+            se.printStackTrace();
             LOG.info(se.getMessage());
         }
     }

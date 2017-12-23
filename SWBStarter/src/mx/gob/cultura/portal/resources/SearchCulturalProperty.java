@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.lang.reflect.Type;
@@ -112,7 +113,8 @@ public class SearchCulturalProperty extends PagerAction {
     
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
-    	Document document = null;
+    	request.setCharacterEncoding("UTF-8");
+        Document document = null;
         List<Entry> publicationList = new ArrayList<>();
     	String url = "/swbadmin/jsp/rnc/documents.jsp";
     	RequestDispatcher rd = request.getRequestDispatcher(url);
@@ -130,7 +132,8 @@ public class SearchCulturalProperty extends PagerAction {
 	    request.setAttribute("paramRequest", paramRequest);
 	    rd.include(request, response);
 	}catch (ServletException se) {
-            LOG.info(se.getMessage());
+            LOG.log(Level.SEVERE, se.getMessage());
+            se.printStackTrace();
 	}
     }
     
@@ -148,7 +151,8 @@ public class SearchCulturalProperty extends PagerAction {
             request.setAttribute("references", publicationList);
 	    request.setAttribute("paramRequest", paramRequest);
 	}catch (Exception se) {
-            LOG.info(se.getMessage());
+            LOG.log(Level.SEVERE, se.getMessage());
+            se.printStackTrace();
 	}
         super.doSort(request, response, paramRequest);
     }
