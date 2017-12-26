@@ -6,35 +6,23 @@
 package mx.gob.cultura.portal.resources;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.util.logging.Logger;
+import mx.gob.cultura.portal.request.GetBICRequest;
+import mx.gob.cultura.portal.response.*;
+import org.semanticwb.portal.api.GenericAdmResource;
+import org.semanticwb.portal.api.SWBParamRequest;
+import org.semanticwb.portal.api.SWBResourceException;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import mx.gob.cultura.portal.response.DateDocument;
-import mx.gob.cultura.portal.response.DigitalObject;
-import mx.gob.cultura.portal.response.Entry;
-import mx.gob.cultura.portal.response.Identifier;
-import mx.gob.cultura.portal.response.Period;
-import mx.gob.cultura.portal.response.Rights;
-import mx.gob.cultura.portal.response.Title;
-import org.semanticwb.SWBUtils;
-
-import org.semanticwb.portal.api.SWBParamRequest;
-import org.semanticwb.portal.api.SWBResourceException;
-
-import org.semanticwb.portal.api.GenericAdmResource;
+import java.util.logging.Logger;
 
 /**
  *
@@ -47,28 +35,21 @@ public class ArtDetail extends GenericAdmResource {
     
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, IOException {
-        Entry entry = null;
         String uri = getResourceBase().getAttribute("url","http://localhost:8080") + "/api/v1/search?identifier=";
         String JSPPath = "/swbadmin/jsp/rnc/artdetail.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(JSPPath);
         try {
             if (null != request.getParameter(IDENTIFIER)) {
                 uri += request.getParameter(IDENTIFIER);
-                URL url = new URL(uri);
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Accept", "application/json");
-                InputStream is = connection.getInputStream();
-                String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
-                Gson gson = new Gson();
-                entry = gson.fromJson(jsonText, Entry.class);
+                GetBICRequest req = new GetBICRequest(uri);
+                Entry entry = req.makeRequest();
                 if (null != entry) {
                     uri = getResourceBase().getAttribute("url","http://localhost:8080")
                             + "/api/v1/search/hits/"
                             + entry.getId();
 
-                    url = new URL(uri);
-                    connection = (HttpURLConnection)url.openConnection();
+                    URL url = new URL(uri);
+                    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
                     connection.setDoOutput(true);
                     connection.setRequestMethod("POST");
                     connection.getOutputStream().close();

@@ -24,6 +24,10 @@ public class GetBICRequest {
         uri = url;
     }
 
+    /**
+     * Makes get request to search endpoint to get a BIC.
+     * @return Entry object with BIC information.
+     */
     public Entry makeRequest() {
         URL url = null;
         Entry entry = null;

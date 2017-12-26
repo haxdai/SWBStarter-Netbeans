@@ -5,33 +5,23 @@
  */
 package mx.gob.cultura.portal.resources;
 
-import java.io.IOException;
-import java.io.InputStream;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.net.URL;
-import java.net.HttpURLConnection;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.lang.reflect.Type;
+import mx.gob.cultura.portal.request.ListBICRequest;
+import mx.gob.cultura.portal.response.Document;
 import mx.gob.cultura.portal.response.Entry;
+import org.semanticwb.portal.api.SWBParamRequest;
+import org.semanticwb.portal.api.SWBResourceException;
+import org.semanticwb.portal.api.SWBResourceModes;
+import org.semanticwb.portal.api.SWBResourceURL;
 
-import javax.servlet.ServletException;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import mx.gob.cultura.portal.response.Document;
-
-import org.semanticwb.SWBUtils;
-import org.semanticwb.portal.api.SWBResourceURL;
-import org.semanticwb.portal.api.SWBParamRequest;
-import org.semanticwb.portal.api.SWBResourceModes;
-import org.semanticwb.portal.api.SWBResourceException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -158,7 +148,6 @@ public class SearchCulturalProperty extends PagerAction {
     }
     
     private Document getReference(HttpServletRequest request) {
-        Document document = new Document();
         String words = request.getParameter("word");
     	String uri = getResourceBase().getAttribute("endpointURL","http://localhost:8080") + "/api/v1/search?q=";
     	uri += getParamSearch(words);
@@ -168,21 +157,9 @@ public class SearchCulturalProperty extends PagerAction {
             if (request.getParameter("sort").equalsIgnoreCase("statdes")) uri += "&sort=-resourcestats.views";
             if (request.getParameter("sort").equalsIgnoreCase("statasc")) uri += "&sort=resourcestats.views";
         }
-    	try {
-            URL url = new URL(uri);
-            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            InputStream is = connection.getInputStream();
-            String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
-            Gson gson = new Gson();
-            Type documentType = new TypeToken<Document>(){}.getType();
-            document = gson.fromJson(jsonText, documentType);
-    	}catch (Exception e) {
-            e.printStackTrace();
-    	    LOG.info(e.getMessage());
-    	}
-    	return document;
+
+		ListBICRequest req = new ListBICRequest(uri);
+        return req.makeRequest();
     }
     
     private List<Entry> getRange(int range, List<Entry> records) {

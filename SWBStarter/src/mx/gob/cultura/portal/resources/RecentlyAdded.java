@@ -1,9 +1,8 @@
 package mx.gob.cultura.portal.resources;
 
-import com.google.gson.Gson;
+import mx.gob.cultura.portal.request.ListBICRequest;
 import mx.gob.cultura.portal.response.Document;
 import mx.gob.cultura.portal.response.Entry;
-import org.semanticwb.SWBUtils;
 import org.semanticwb.portal.api.GenericResource;
 import org.semanticwb.portal.api.SWBParamRequest;
 import org.semanticwb.portal.api.SWBResourceException;
@@ -12,9 +11,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,11 +27,10 @@ public class RecentlyAdded extends GenericResource {
                        SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
 
         List<Entry> references;
-        //List<Entry> publicationList = new ArrayList<>();
         String url = "/swbadmin/jsp/rnc/recentlyAddedCarousel.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(url);
         try {
-            references = getReferences(request);
+            references = getReferences();
             request.setAttribute("recentlyAddedList", references);
             request.setAttribute("paramRequest", paramRequest);
             rd.include(request, response);
@@ -45,23 +40,14 @@ public class RecentlyAdded extends GenericResource {
         }
     }
 
-    private List<Entry> getReferences(HttpServletRequest request) {
+    private List<Entry> getReferences() {
         String uri = getResourceBase().getAttribute("endpointURL", "https://search.innovatic.com.mx") + "/api/v1/search?sort=-indexcreated&size=10";
         List<Entry> publicationList = new ArrayList<>();
-        try {
-            URL url = new URL(uri);
-            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            InputStream is = connection.getInputStream();
-            String jsonText = SWBUtils.IO.readInputStream(is, "UTF-8");
-            Gson gson = new Gson();
-            Document resp = gson.fromJson(jsonText, Document.class);
+        ListBICRequest req = new ListBICRequest(uri);
+
+        Document resp = req.makeRequest();
+        if (null != resp) {
             publicationList = resp.getRecords();
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-            publicationList = new ArrayList<>();
-            LOG.info(e.getMessage());
         }
         return publicationList;
     }
