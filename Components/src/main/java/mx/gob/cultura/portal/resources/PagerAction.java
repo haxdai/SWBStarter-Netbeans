@@ -45,7 +45,7 @@ public class PagerAction extends GenericResource {
 
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, IOException {
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
         String mode = paramRequest.getMode();
         if (MODE_PAGE.equals(mode)) {
             doPage(request, response, paramRequest);
@@ -61,6 +61,12 @@ public class PagerAction extends GenericResource {
             super.processRequest(request, response, paramRequest);
     }
 
+    @Override
+    public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, IOException {
+        request.getSession().removeAttribute(this.FULL_LIST);
+        request.getSession().removeAttribute(this.PAGE_LIST);
+    }
+    
     public void init(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
         int pagenum = 0;
         HttpSession session = request.getSession();
@@ -103,6 +109,7 @@ public class PagerAction extends GenericResource {
             request.setAttribute("paramRequest", paramRequest);
             rd.include(request, response);
         }catch (ServletException se) {
+            se.printStackTrace();
             LOG.info(se.getMessage());
         }
     }
