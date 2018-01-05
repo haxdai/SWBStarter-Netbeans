@@ -46,7 +46,7 @@
                             <%
                                 for (CountName r : resourcetypes) {
                                     %>
-                                    <li><label class="form-check-label"><input class="form-check-input" type="checkbox" value=""><%=r.getName()%></label></li>
+                                    <li><label class="form-check-label"><input class="form-check-input" type="checkbox" value=""><%=r.getCapitalizeName()%></label></li>
                                     <%
                                 }
                             %>
