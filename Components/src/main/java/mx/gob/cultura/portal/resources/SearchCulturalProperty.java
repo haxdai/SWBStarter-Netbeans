@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.semanticwb.SWBPlatform;
 
 /**
  *
@@ -111,11 +112,13 @@ public class SearchCulturalProperty extends PagerAction {
     	try {
             if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
     		document = getReference(request);
-                publicationList = getRange(getStart(request), document.getRecords());
-                request.setAttribute("aggs", document.getAggs());
-    		request.setAttribute("count", document.getTotal());
+                if (null != document) {
+                    publicationList = getRange(getStart(request), document.getRecords());
+                    request.setAttribute("aggs", document.getAggs());
+                    request.setAttribute("count", document.getTotal());
+                    request.getSession().setAttribute(FULL_LIST, document.getRecords());
+                }
                 request.setAttribute("word", request.getParameter("word"));
-                request.getSession().setAttribute(FULL_LIST, document.getRecords());
                 init(request, response, paramRequest);
     	    }
             request.setAttribute("references", publicationList);
@@ -148,8 +151,9 @@ public class SearchCulturalProperty extends PagerAction {
     }
     
     private Document getReference(HttpServletRequest request) {
+        Document document = null;
         String words = request.getParameter("word");
-    	String uri = getResourceBase().getAttribute("endpointURL","http://localhost:8080") + "/api/v1/search?q=";
+    	String uri = SWBPlatform.getEnv("rnc/endpointURL",getResourceBase().getAttribute("endpointURL","http://localhost:8080")) + "/api/v1/search?q=";
     	uri += getParamSearch(words);
         if (null != request.getParameter("sort")) {
             if (request.getParameter("sort").equalsIgnoreCase("datedes")) uri += "&sort=-datecreated.value";
@@ -157,9 +161,13 @@ public class SearchCulturalProperty extends PagerAction {
             if (request.getParameter("sort").equalsIgnoreCase("statdes")) uri += "&sort=-resourcestats.views";
             if (request.getParameter("sort").equalsIgnoreCase("statasc")) uri += "&sort=resourcestats.views";
         }
-
-		ListBICRequest req = new ListBICRequest(uri);
-        return req.makeRequest();
+	ListBICRequest req = new ListBICRequest(uri);
+        try {
+            document = req.makeRequest();
+        }catch (Exception se) {
+            LOG.log(Level.SEVERE, se.getMessage());
+        }
+        return document;
     }
     
     private List<Entry> getRange(int range, List<Entry> records) {
