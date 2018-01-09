@@ -29,6 +29,11 @@ public class Document implements Serializable {
         this.records = records;
     }
 
+    @Override
+    public String toString() {
+        return "Document{" + "total=" + total + ", records=" + records + '}';
+    }
+
     public int getTotal() {
         return total;
     }
@@ -51,10 +56,5 @@ public class Document implements Serializable {
 
     public void setAggs(List<Aggregation> aggs) {
         this.aggs = aggs;
-    }
-
-    @Override
-    public String toString() {
-        return "Document{" + "aggs=" + aggs + '}';
     }
 }

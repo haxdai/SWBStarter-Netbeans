@@ -16,11 +16,11 @@ public class Aggregation implements Serializable {
 
     private static final long serialVersionUID = 7895964432008759515L;
     
-    List<CountName> dates;
+    private List<CountName> dates;
     
-    List<CountName> holders;
+    private List<CountName> holders;
     
-    List<CountName> resourcetypes;
+    private List<CountName> resourcetypes;
 
     public List<CountName> getHolders() {
         return holders;

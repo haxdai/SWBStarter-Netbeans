@@ -22,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpSession;
 import org.semanticwb.SWBPlatform;
+
+import static mx.gob.cultura.portal.resources.PagerAction.NUM_PAGE_LIST;
 
 /**
  *
@@ -113,9 +116,9 @@ public class SearchCulturalProperty extends PagerAction {
             if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
     		document = getReference(request);
                 if (null != document) {
-                    publicationList = getRange(getStart(request), document.getRecords());
+                    publicationList = document.getRecords();
                     request.setAttribute("aggs", document.getAggs());
-                    request.setAttribute("count", document.getTotal());
+                    request.getSession().setAttribute("NUM_RECORDS_TOTAL", document.getTotal());
                     request.getSession().setAttribute(FULL_LIST, document.getRecords());
                 }
                 request.setAttribute("word", request.getParameter("word"));
@@ -126,35 +129,71 @@ public class SearchCulturalProperty extends PagerAction {
 	    rd.include(request, response);
 	}catch (ServletException se) {
             LOG.log(Level.SEVERE, se.getMessage());
-            se.printStackTrace();
 	}
     }
     
     @Override
     public void doSort(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, java.io.IOException {
-         List<Entry> publicationList = new ArrayList<>();
+        Document document = null;
+        List<Entry> publicationList = new ArrayList<>();
         try {
             if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
-    		Document document = getReference(request);
-                publicationList = getRange(getStart(request), document.getRecords());
+    		document = getReference(request);
+                if (null != document) {
+                    publicationList = document.getRecords();
+                    request.getSession().setAttribute(FULL_LIST, document.getRecords());
+                }
+                request.setAttribute("f", request.getParameter("sort"));
                 request.setAttribute("word", request.getParameter("word"));
-                request.getSession().setAttribute(FULL_LIST, document.getRecords());
                 init(request, response, paramRequest);
     	    }
             request.setAttribute("references", publicationList);
 	    request.setAttribute("paramRequest", paramRequest);
 	}catch (Exception se) {
             LOG.log(Level.SEVERE, se.getMessage());
-            se.printStackTrace();
 	}
         super.doSort(request, response, paramRequest);
+    }
+    
+    @Override
+    public void doPage(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws java.io.IOException {
+        int pagenum = 0;
+        Document document = null;
+        String p = request.getParameter("p");
+        HttpSession session = request.getSession();
+        List<Entry> publicationList = null;
+        if (null != p)
+            pagenum = Integer.parseInt(p);
+        if (pagenum<=0) pagenum = 1;
+        session.setAttribute(NUM_PAGE_LIST, pagenum);
+        session.setAttribute("PAGE_NUM_ROW", PAGE_NUM_ROW);
+        document = getReference(request);
+        if (null != document) {
+            publicationList = document.getRecords();
+            request.getSession().setAttribute(FULL_LIST, publicationList);
+            page(pagenum, session);
+        }
+        request.setAttribute("word", request.getParameter("word"));
+        String url = "/swbadmin/jsp/rnc/rows.jsp";
+        if (null != request.getParameter("m") && "l".equalsIgnoreCase(request.getParameter("m")))
+            request.setAttribute("mode", "row lista");
+        else request.setAttribute("mode", "row");
+        request.setAttribute("m",request.getParameter("m"));
+        RequestDispatcher rd = request.getRequestDispatcher(url);
+        try {
+            request.setAttribute("paramRequest", paramRequest);
+            rd.include(request, response);
+        }catch (ServletException se) {
+            LOG.info(se.getMessage());
+        }
     }
     
     private Document getReference(HttpServletRequest request) {
         Document document = null;
         String words = request.getParameter("word");
-    	String uri = SWBPlatform.getEnv("rnc/endpointURL",getResourceBase().getAttribute("endpointURL","http://localhost:8080")) + "/api/v1/search?q=";
+    	String uri = SWBPlatform.getEnv("rnc/endpointURL",getResourceBase().getAttribute("endpointURL","http://localhost:8080")).trim() + "/api/v1/search?q=";
     	uri += getParamSearch(words);
+        uri += getRange(request);
         if (null != request.getParameter("sort")) {
             if (request.getParameter("sort").equalsIgnoreCase("datedes")) uri += "&sort=-datecreated.value";
             if (request.getParameter("sort").equalsIgnoreCase("dateasc")) uri += "&sort=datecreated.value";
@@ -170,7 +209,22 @@ public class SearchCulturalProperty extends PagerAction {
         return document;
     }
     
-    private List<Entry> getRange(int range, List<Entry> records) {
+    private String getRange(HttpServletRequest request) {
+        int s = 0;
+    	StringBuilder range = new StringBuilder("&from=");
+    	String start = request.getParameter("p");
+        if (null != start) {
+            try { 
+                s = Integer.parseInt(start);
+                if (s > 1) s = (s-1)*SEGMENT;
+            }catch (NumberFormatException e) { }
+        }
+        range.append(String.valueOf(s));
+    	range.append("&size=").append(SEGMENT);
+    	return range.toString();
+    }
+    
+    /**private List<Entry> getRange(int range, List<Entry> records) {
         List<Entry> publicationListTmp = new ArrayList<>();
         if (null != records && records.size() > SEGMENT) {
             int count = 0;
@@ -182,7 +236,7 @@ public class SearchCulturalProperty extends PagerAction {
             records = publicationListTmp;
         }
         return records;
-    }
+    }**/
     
     private String getParamSearch(String words) {
     	StringBuilder parameters = new StringBuilder();
@@ -201,13 +255,14 @@ public class SearchCulturalProperty extends PagerAction {
             return words;
     }
     
-    private int getStart(HttpServletRequest request) {
+    /**private int getStart(HttpServletRequest request) {
     	int s = 1;
-    	String id=String.valueOf(getResourceBase().getId());
-    	String start = request.getParameter("s"+id);
-    	try { s = Integer.parseInt(start); } 
-    	catch (Exception e) { s=1; }
+    	String start = request.getParameter("s");
+    	try { 
+            if (null != start)
+                s = Integer.parseInt(start); 
+        }catch (NumberFormatException e) { }
         if (s > 0) s = s*SEGMENT-1;
     	return s;
-    }
+    }**/
 }

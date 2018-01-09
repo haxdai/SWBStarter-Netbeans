@@ -109,7 +109,6 @@ public class PagerAction extends GenericResource {
             request.setAttribute("paramRequest", paramRequest);
             rd.include(request, response);
         }catch (ServletException se) {
-            se.printStackTrace();
             LOG.info(se.getMessage());
         }
     }
@@ -150,44 +149,43 @@ public class PagerAction extends GenericResource {
         page(pagenum, session);
     }
 
-    private void page(int pagenum, HttpSession session) {
+    protected void page(int pagenum, HttpSession session) {
         List<?> rows = (List<?>)session.getAttribute(FULL_LIST);
-        if (rows==null) rows = new ArrayList();
+        Integer total = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
+        if (null==total) total = 0;
+        if (null==rows) rows = new ArrayList();
         try {
-            Integer totalPages = rows.size()/PAGE_NUM_ROW;
-            if (rows.size()%PAGE_NUM_ROW != 0)
+            Integer totalPages = total/PAGE_NUM_ROW;
+            if (total%PAGE_NUM_ROW != 0)
                 totalPages ++;
             session.setAttribute(TOTAL_PAGES, totalPages);
             Integer currentLeap = (pagenum-1)/PAGE_JUMP_SIZE;
             session.setAttribute(NUM_PAGE_JUMP, currentLeap);
             session.setAttribute("PAGE_JUMP_SIZE", PAGE_JUMP_SIZE);
-            List rowsPage = getRows(pagenum, rows);
-            session.setAttribute(PAGE_LIST, rowsPage);
-            session.setAttribute("NUM_RECORDS_TOTAL", rows.size());
-            session.setAttribute("NUM_RECORDS_VISIBLE", rowsPage.size());
+            //ArrayList rowsPage = getRows(pagenum, rows);
+            session.setAttribute(PAGE_LIST, rows);
+            session.setAttribute("NUM_RECORDS_VISIBLE", rows.size());
         }catch(Exception e) {
             LOG.info(e.getMessage());
         }
     }
 
-    private List getRows(int page, List<?> rows) {
+    /**private ArrayList getRows(int page, List<?> rows) {
         int pageCount = 1;
         if (rows==null || rows.isEmpty()) return new ArrayList();
-        Map<Integer, List<?>> pagesRows = new HashMap<>();
-        List pageRows = new ArrayList();
+        Map<Integer, ArrayList<?>> pagesRows = new HashMap<>();
+        ArrayList pageRows = new ArrayList();
         pagesRows.put(pageCount, pageRows);
         for (int i=0; i<rows.size(); i++) {
             pageRows.add(rows.get(i));
-            if (i+1 < rows.size()) {
-                if (((i+1) % PAGE_NUM_ROW) == 0) {
-                    pageCount++;
-                    pageRows = new ArrayList();
-                    pagesRows.put(pageCount, pageRows);
-                }
+            if (i+1 < rows.size() && ((i+1) % PAGE_NUM_ROW) == 0) {
+                pageCount++;
+                pageRows = new ArrayList();
+                pagesRows.put(pageCount, pageRows);
             }
         }
-        List rowsPage = pagesRows.get(page);
+        ArrayList rowsPage = pagesRows.get(page);
         if (rowsPage==null) rowsPage = new ArrayList();
         return rowsPage;
-    }
+    }**/
 }
