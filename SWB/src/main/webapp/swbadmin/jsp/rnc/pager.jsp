@@ -7,7 +7,7 @@
 	int paginaInicialBloque = 0;
 	int primerRegistroMostrado = 0;
 	int ultimoRegistroMostrado = 0;
-    Integer totalPages = (Integer)session.getAttribute("TOTAL_PAGES");
+        Integer totalPages = (Integer)session.getAttribute("TOTAL_PAGES");
 	Integer numPageList = (Integer)session.getAttribute("NUM_PAGE_LIST");
 	Integer pageJumpSize = (Integer)session.getAttribute("NUM_PAGE_JUMP");
 	Integer numRecordsTotal = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
@@ -17,8 +17,8 @@
 	Integer registrosPorPagina = (Integer)session.getAttribute("NUM_RECORDS_VISIBLE");
 	Integer totalRegistros = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
 	if (null == paginaActual) paginaActual = 1;
-    List<Entry> references = (List<Entry>)session.getAttribute("PAGE_LIST");
-	if (paginaActual != 0 && totalPaginas !=0 && totalRegistros != 0 && registrosPorPagina != 0 && totalRegistros != 0) {
+        List<Entry> references = (List<Entry>)session.getAttribute("PAGE_LIST");
+	if (paginaActual != 0 && totalPaginas !=0 && totalRegistros != 0 && registrosPorPagina != 0) {
 		numBloque = (paginaActual-1)/paginasPorBloque - (paginaActual-1)%paginasPorBloque/paginasPorBloque;
 		ultimoBloque = (totalPaginas-1)/paginasPorBloque - (totalPaginas-1)%paginasPorBloque/paginasPorBloque;
 		paginaInicialBloque = numBloque*paginasPorBloque+1;
@@ -33,9 +33,10 @@
 		}
 	}
 	String m = null != request.getAttribute("m") ? (String)request.getAttribute("m") : "g";
+	String f = null != request.getAttribute("f") ? (String)request.getAttribute("f") : "relvdes";
 %>
 <div id="pages" class="container paginacion">
-	<ul class="azul">
+    <ul class="azul">
 		<!-- liga para saltar al bloque anterior -->
 	<%
 		if (totalPages > 1) { //TODO: Check condition
@@ -44,9 +45,9 @@
 			<li><a href="#"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></a></li>
 	<%
 			}else {
-			int primeraPaginaBloqueAnterior = (numBloque-1)*paginasPorBloque+1;
+				int primeraPaginaBloqueAnterior = (numBloque-1)*paginasPorBloque+1;
 	%>
-			<li><a class="fa fa-long-arrow-left" aria-hidden="true" title="anterior" href="javascript:doPage('<%= primeraPaginaBloqueAnterior+",'"+m%>')" >&nbsp;</a></li>
+			<li><a class="fa fa-long-arrow-left" aria-hidden="true" title="anterior" href="javascript:doPage(<% out.print(""+primeraPaginaBloqueAnterior+",'"+m+",'"+f); %>')">&nbsp;</a></li>
 	<%
 			}
 		}
@@ -57,22 +58,22 @@
 			if (i==paginaActual) {
 				out.println("<li><a href=\"#\" class=\"select\">"+i+"</a></li>");
 			}else {
-				out.println("<li><a href=\"#\" onclick=\"javascript:doPage("+i+",'"+m+"')\">"+i+"</a></li>");
+				out.println("<li><a href=\"#\" onclick=\"javascript:doPage("+i+",'"+m+"','"+f+"')\">"+i+"</a></li>");
 			}
 		}
 	%>
 	
 	<!-- liga para saltar al bloque posterior -->
 	<%
-        if (totalPages > 1) { //TODO: Check condition
-		    if (numBloque==ultimoBloque || totalRegistros==0) {
+            if (totalPages > 1) {
+		if (numBloque==ultimoBloque || totalRegistros==0) {
 	%>
 			<li><a href="#"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></li>
 	<%
 		    }else {
 			    int primeraPaginaBloqueSiguiente = (numBloque+1)*paginasPorBloque+1;
 	%>
-			<li><a href="#" onclick="doPage('<%= primeraPaginaBloqueSiguiente+",'"+m %>')"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></li>
+			<li><a href="#" onclick="doPage('<%= primeraPaginaBloqueSiguiente+",'"+m+",'"+f %>')"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></li>
 	<%
 		    }
         }

@@ -15,13 +15,14 @@
     WebSite site = paramRequest.getWebPage().getWebSite();
 %>
 <script type="text/javascript">
-    function setList() { doPage(1, 'l'); }
-    function setGrid() { doPage(1, 'g'); }
-    function doPage(p, m) {
+    function setList() { doPage(1, 'l', 'relvdes'); }
+    function setGrid() { doPage(1, 'g', 'relvdes'); }
+    function doPage(p, m, f) {
         dojo.xhrPost({
-            url: '<%=pageURL%>?p='+p+'&m='+m,
+            url: '<%=pageURL%>?p='+p+'&m='+m+'&sort='+f+'&word=<%=word%>',
             load: function(data) {
                 dojo.byId('references').innerHTML=data;
+				location.href = '#showPage';
             }
         });
     }
@@ -37,6 +38,7 @@
     <% } %>
     <div id="contenido">
         <div class="ruta oswL">
+			<a name="showPage"></a>
             <a class="rojo" href="javascript:history.go(-1)"><i aria-hidden="true" class="fa fa-long-arrow-left"></i> Regresar</a> | <a href="/swb/<%=site.getId()%>/home">Inicio</a> / Resultados de la b&uacute;squeda
         </div>
         <% if (!references.isEmpty()) {  %>
