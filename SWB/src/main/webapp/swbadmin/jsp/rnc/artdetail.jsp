@@ -4,9 +4,9 @@
     Author     : sergio.tellez
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@page import="mx.gob.cultura.portal.response.DateDocument"%>
-<%@page import="mx.gob.cultura.portal.response.DigitalObject"%>
-<%@page import="mx.gob.cultura.portal.response.Entry, mx.gob.cultura.portal.response.Title, org.semanticwb.portal.api.SWBParamRequest, java.util.ArrayList, java.util.List"%>
+<%@ page import="mx.gob.cultura.portal.response.DateDocument, mx.gob.cultura.portal.response.DigitalObject"%>
+<%@ page import="mx.gob.cultura.portal.resources.ArtDetail, mx.gob.cultura.portal.response.Entry, mx.gob.cultura.portal.response.Title, org.semanticwb.model.WebSite, org.semanticwb.portal.api.SWBParamRequest, java.util.ArrayList, java.util.List"%>
+<script type="text/javascript" src="/swbadmin/js/dojo/dojo/dojo.js" djConfig="parseOnLoad: true, isDebug: false, locale: 'en'"></script>
 <%
     int index = 0;
     String title = "";
@@ -16,7 +16,6 @@
     List<String> creators = new ArrayList<>();
     DateDocument datestart = new DateDocument();
     List<DigitalObject> digitalobjects = new ArrayList<>();
-    SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
     Entry entry = (Entry)request.getAttribute("entry");
     if (null != entry && null != entry.getDigitalobject()) {
         creators = entry.getCreator();
@@ -27,7 +26,34 @@
         period = null != datestart ? datestart.getValue() : "";
         if (!titles.isEmpty()) title = titles.get(0).getValue();
     }
+    SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
+    WebSite site = paramRequest.getWebPage().getWebSite();
 %>
+<script>
+    function add(id) {
+	dojo.xhrPost({
+            url: '/swb/<%=site.getId()%>/favorito?id='+id,
+            load: function(data) {
+                dojo.byId('addCollection').innerHTML=data;
+		$('#addCollection').modal('show');
+            }
+        });
+    }
+    function loadDoc(id) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                jQuery("#addCollection-tree").html(this.responseText);
+                $("#addCollection" ).dialog( "open" );
+            }else if (this.readyState == 4 && this.status == 403) {
+                jQuery("#addCollection-tree").text("Regístrate o inicia sesión para crear tus colecciones.");
+                $("#addCollection" ).dialog( "open" );
+            }
+        };
+	xhttp.open("GET", "/swb/<%=site.getId()%>/favorito?id="+id, true);
+	xhttp.send();
+    }
+</script>
 <div class="row row-offcanvas row-offcanvas-right" id="detallecont">
     <div class="col-12 col-md-9" id="contenido">
         <p class="float-right d-md-none">
@@ -129,7 +155,7 @@
     </div>
     <div class="col-xs-12 col-sm-2 col-md-3 col-lg-3 col-xl-2">
         <a href="#"><i class="fa fa-search-plus" aria-hidden="true"></i></a>
-        <a href="#"><i class="fa fa-heart" aria-hidden="true"></i></a>
+        <a href="#" onclick="loadDoc('<%=entry.getId()%>');"><i class="fa fa-heart" aria-hidden="true"></i></a>
         <a href="#"><i class="fa fa-share-alt" aria-hidden="true"></i></a>
         <a href="#"><i class="fa fa-download" aria-hidden="true"></i></a>
     </div>
@@ -149,3 +175,23 @@
     </div>
 </section>
 <% } %>
+
+<div id="dialog-message-tree" title="error">
+    <p>
+	<span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
+	<div id="dialog-text-tree"></div>
+    </p>
+</div>
+<div id="dialog-success-tree" title="éxito">
+    <p>
+	<span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
+	<div id="dialog-msg-tree"></div>
+    </p>
+</div>
+
+<div id="addCollection" title="Agregar a colección">
+    <p>
+	<span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
+	<div id="addCollection-tree"></div>
+    </p>
+</div>

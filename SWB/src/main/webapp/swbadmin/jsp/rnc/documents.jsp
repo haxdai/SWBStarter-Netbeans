@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@page import="mx.gob.cultura.portal.response.DigitalObject"%>
 <%@page import="mx.gob.cultura.portal.response.Entry"%>
+<%@page import="mx.gob.cultura.portal.response.Utils, mx.gob.cultura.portal.response.DigitalObject"%>
 <%@page import="mx.gob.cultura.portal.response.Title,org.semanticwb.model.WebSite, org.semanticwb.portal.api.SWBParamRequest, org.semanticwb.portal.api.SWBResourceURL, java.util.List"%>
 <script type="text/javascript" src="/swbadmin/js/dojo/dojo/dojo.js"
         djConfig="parseOnLoad: true, isDebug: false, locale: 'en'"></script>
@@ -12,6 +12,7 @@
     pagesURL.setCallMethod(SWBParamRequest.Call_DIRECT);
     List<Entry> references = (List<Entry>)session.getAttribute("PAGE_LIST");
     String word = (String)request.getAttribute("word");
+    if (null != word) word = Utils.suprXSS(word);
     WebSite site = paramRequest.getWebPage().getWebSite();
 %>
 <script type="text/javascript">
@@ -22,7 +23,7 @@
             url: '<%=pageURL%>?p='+p+'&m='+m+'&sort='+f+'&word=<%=word%>',
             load: function(data) {
                 dojo.byId('references').innerHTML=data;
-				location.href = '#showPage';
+		location.href = '#showPage';
             }
         });
     }
