@@ -52,7 +52,11 @@ public class SessionInitializer extends GenericResource {
             doRedirect(request, response, paramRequest);
         } else {
             if (paramRequest.getCallMethod() == SWBParamRequest.Call_STRATEGY) {
-                showStrategyView(request, response, paramRequest);
+                if (this.getResourceBase().getResourceSubType().getId().equals("socialNetDisplay")) {
+                    showSocialNetLinks(request, response, paramRequest);
+                } else {
+                    showStrategyView(request, response, paramRequest);
+                }
             } else if (paramRequest.getCallMethod() == SWBParamRequest.Call_CONTENT) {
                 showContentView(request, response, paramRequest);
             } else if (paramRequest.getCallMethod() == SWBParamRequest.Call_DIRECT) {
@@ -341,6 +345,41 @@ public class SessionInitializer extends GenericResource {
         } catch (Exception se) {
             se.printStackTrace(System.err);
         }
+    }
+    
+    /**
+     * Genera la interface de usuario con enlaces de las redes sociales para iniciar sesion
+     * @param request la peticion del cliente
+     * @param response la respuesta al cliente
+     * @param paramsRequest reune parametros de SWB utiles para la respuesta de la peticion
+     */
+    private void showSocialNetLinks(HttpServletRequest request, HttpServletResponse response,
+            SWBParamRequest paramsRequest) {
+        
+        try {
+            PrintWriter out = response.getWriter();
+            if (!paramsRequest.getUser().isSigned()) {
+                out.println(SessionInitializer.getFacebookLink(paramsRequest.getWebPage().getWebSiteId()));
+            } else {
+                out.println("<!-- user is signed -->");
+            }
+        } catch (Exception se) {
+            se.printStackTrace(System.err);
+        }
+    }
+    
+    /**
+     * Genera la liga hacia el inicio de sesion con Facebook
+     * @param modelId el identificador del sitio a partir del cual se obtiene la imagen a mostrar
+     * @return un {@code String} representando un enlace para iniciar sesion con Facebook
+     */
+    public static String getFacebookLink(String modelId) {
+        
+        StringBuilder text = new StringBuilder(128);
+        text.append("<a href=\"#\" onclick=\"javascript:faceLogin();\"><img src=\"/work/models/");
+        text.append(modelId);
+        text.append("/img/icono-fb.png\"></a>\n");
+        return text.toString();
     }
     
     private void showContentView(HttpServletRequest request, HttpServletResponse response,

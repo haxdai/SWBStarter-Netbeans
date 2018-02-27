@@ -3,7 +3,8 @@
     Created on : 13/02/2018, 05:43:59 PM
     Author     : jose.jimenez
 --%><%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@page import="org.semanticwb.portal.api.SWBParamRequest, org.semanticwb.SWBPlatform, mx.gob.cultura.portal.resources.SessionInitializer, org.semanticwb.portal.api.SWBResourceException"%>
+<%@page import="org.semanticwb.portal.api.SWBParamRequest, org.semanticwb.SWBPlatform, org.semanticwb.model.WebPage"%>
+<%@page import="mx.gob.cultura.portal.resources.SessionInitializer, org.semanticwb.portal.api.SWBResourceException"%>
 <%
     SWBParamRequest paramsRequest = (SWBParamRequest) request.getAttribute("paramRequest");
     StringBuilder text = new StringBuilder(256);
@@ -91,11 +92,12 @@
             });
           }
         </script>
-        <div class="sesion dropdown show">
-            <a class="" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-                <span class="ion-person"></span> <i><%=mainLabel%></i>
-                <span class="ion-arrow-down-b"></span>
-            </a>
+        <div class="sesion">
+            <button class="btn-sesion" data-toggle="modal" data-target="#modal-sesion"><!-- id="dropdownMenuLink" -->
+                <span class="ion-person"></span>
+                <i><%=mainLabel%></i>
+            </button>
+        </div>
 <%
             String loginUrl = new StringBuilder(128).append(SWBPlatform.getContextPath())
                     .append("/login/")
@@ -145,45 +147,55 @@
                 socialLogin = "Inicia con: ";
             }
 %>
-            <div class="sesiondisplay dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <p><%=dialogTitle%></p>
-                <fieldset>
-                    <form action="<%=loginUrl%>" method="post">
-                      <div class="form-group">
-                        <label for="wb_username"><%=userField%></label>
-                        <input type="text" id="wb_username" class="form-control" name="wb_username" aria-describedby="emailHelp" placeholder="<%=userplaceHldr%>"/>
-                      </div>
-                      <div class="form-group">
-                        <label for="wb_password"><%=pswdField%></label>
-                        <input type="password" id="wb_password" name="wb_password" class="form-control" placeholder="<%=pwdplaceHldr%>"/>
-                      </div>
-<%--                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="dropdownCheck" >
-                        <label class="form-check-label" for="dropdownCheck">Recuérdame</label>
-                      </div> --%>
-                      <button type="submit" class="btn btn-negro"><%=submitBtn%></button>
-<%--                    <p><a href="#">Olvidé mi usuario o contraseña</a></p> --%>
-                      <hr>
-                      <p><%=socialLogin%>
+            <div class="modal fade" id="modal-sesion">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title oswM rojo"><%=dialogTitle%></h3>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span class="ion-close-round"></span>
+                            </button>
+                        </div>
+                        <div class="modal-body modal-sesion">
+                            <form action="<%=loginUrl%>" method="post">
+                                <div class="form-group">
+                                    <label for="wb_username" class="rojo"><%=userField%></label>
+                                    <input type="text" id="wb_username" class="form-control" name="wb_username" aria-describedby="usernameHelp" placeholder="<%=userplaceHldr%>"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="wb_password" class="rojo"><%=pswdField%></label>
+                                    <input type="password" id="wb_password" name="wb_password" class="form-control" placeholder="<%=pwdplaceHldr%>"/>
+                                </div>
+<%--                            <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="dropdownCheck" >
+                                    <label class="form-check-label" for="dropdownCheck">Recuérdame</label>
+                                </div> --%>
+                                <button type="submit" class="btn-cultura btn-negro"><%=submitBtn%></button>
+                            </form>
+<%--                            <p><a href="#" class="link">Olvidé mi usuario o contraseña</a></p>
+                                <hr> --%>
+                            <p class="oswM rojo inicia"><%=socialLogin%>
 <%--
                       <div class="fb-login-button" data-max-rows="1" 
                      data-size="small" data-button-type="login_with"
                      data-show-faces="false" data-auto-logout-link="false" 
                      data-scope="public_profile,email" 
                      data-use-continue-as="false" onlogin="openSWBSession();"></div>  --%>
-                        <a href="#" onclick="javascript:faceLogin();"><img src="/work/models/<%=paramsRequest.getWebPage().getWebSiteId()%>/img/icono-fb.png" ></a>
-                      </p>
+                        <%=SessionInitializer.getFacebookLink(paramsRequest.getWebPage().getWebSiteId())%>
+<%--                        <a href="#" onclick="javascript:faceLogin();"><img src="/work/models/<%=paramsRequest.getWebPage().getWebSiteId()%>/img/icono-fb.png" ></a> --%>
+                            </p>
+                        </div>
 <%--
-//                    <div class="nocuenta">
-//                      <p>¿No tienes una cuenta?</p>
-//                      <p><a href="#" class="btn" >Crea aquí tu cuenta</a></p>
+//                    <div class="nocuenta rojo-bg">
+//                      <h5>¿No tienes una cuenta?</h5>
+//                      <p><a href="#" class="btn-cultura btn-negro">Crea aquí tu cuenta</a></p>
 //                    </div>  --%>
-                  </form>
-                </fieldset>
+                    </div>
+                </div>
             </div>
-        </div>
 <%
         } else {  //si si existe el usuario en sesion de SWB
+            WebPage wpCollections = paramsRequest.getWebPage().getWebSite().getWebPage("mis_colecciones");
             if (isSocialNetUser) {
                 //revisar que la sesion de la red social este activa tambien
                 //esto es parte de la funcion mystatusChangeCallback
@@ -226,13 +238,23 @@
 %>
           }
             </script>
-            <div class="sesion">
+            <div class="sesion btn-group" role="group">
+                <button id="sesionDrop" type="button" class="btn-sesion" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="ion-person"></span>
+                    <i><%=paramsRequest.getUser().getFirstName()%></i>
+                </button>
+                <div class="dropdown-menu sesiondisplay gris21-bg" aria-labelledby="sesionDrop">
+<%
+    if (wpCollections != null) {
+%>
+                    <a class="dropdown-item" href="<%=wpCollections.getWebPageURL(paramsRequest.getUser().getLanguage())%>"><%=wpCollections.getTitle(paramsRequest.getUser().getLanguage())%></a>
+<%
+    }
+%>
 <%
             if (isSocialNetUser) {
 %>
-                  <a class="" href="#" role="button" onclick="closeSWBSession();">
-                    <span class="ion-person"></span><i> <%=mainLabel%></i>
-                  </a>
+                    <a class="dropdown-item" href="#" onclick="closeSWBSession();"><%=mainLabel%></a>
 <%
             } else {
                 String logoutUrl = new StringBuilder()
@@ -242,12 +264,11 @@
                         .append("/")
                         .append(paramsRequest.getWebPage().getId()).toString();
 %>
-                  <a class="" role="button" href="<%=logoutUrl%>?wb_logout=true">
-                    <span class="ion-person"></span><i> <%=mainLabel%></i>
-                  </a>
+                    <a class="dropdown-item" href="<%=logoutUrl%>?wb_logout=true"><%=mainLabel%></a>
 <%
             }
 %>
+                </div>
             </div>
 <%        }
 %>
