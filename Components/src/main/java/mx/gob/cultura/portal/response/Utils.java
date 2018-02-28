@@ -5,9 +5,12 @@
  */
 package mx.gob.cultura.portal.response;
 
+import com.hp.hpl.jena.sparql.sse.lang.parser.ParseException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -59,5 +62,16 @@ public class Utils {
     		writer.write(entityName);
             }
     	}
+    }
+    
+    public static Date convert(String sDate) {
+        if (null == sDate || sDate.isEmpty()) return null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try {
+            return sdf.parse(sDate);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return new Date();
+        }
     }
 }
