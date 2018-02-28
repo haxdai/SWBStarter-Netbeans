@@ -20,8 +20,11 @@ import java.util.logging.Logger;
  * @author jose.jimenez
  */
 public class RecentlyAdded extends GenericResource {
-    private static final Logger LOG = Logger.getLogger(MostSeen.class.getName());
+    
+    
+    private static final Logger LOG = Logger.getLogger(RecentlyAdded.class.getName());
 
+    
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response,
                        SWBParamRequest paramRequest) throws java.io.IOException {
@@ -35,7 +38,7 @@ public class RecentlyAdded extends GenericResource {
             request.setAttribute("paramRequest", paramRequest);
             rd.include(request, response);
         } catch (ServletException se) {
-            se.printStackTrace();
+            se.printStackTrace(System.err);
             LOG.info(se.getMessage());
         }
     }
