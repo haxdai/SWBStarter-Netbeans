@@ -2,7 +2,7 @@
     Document   : sessionInitializerMenu
     Created on : 13/02/2018, 05:43:59 PM
     Author     : jose.jimenez
---%><%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+--%><%@ page contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
 <%@page import="org.semanticwb.portal.api.SWBParamRequest, org.semanticwb.SWBPlatform, org.semanticwb.model.WebPage"%>
 <%@page import="mx.gob.cultura.portal.resources.SessionInitializer, org.semanticwb.portal.api.SWBResourceException"%>
 <%
@@ -62,7 +62,6 @@
             String sessionUrl = paramsRequest.getActionUrl().setAction("openSession")
                     .setCallMethod(SWBParamRequest.Call_DIRECT).toString();
 %>
-            console.log('Revisando status:.... ' + JSON.stringify(response));
             if (response.status && response.status === 'connected') {
               FB.logout();
             }
@@ -76,16 +75,17 @@
               xhttp.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
                   location.reload();
+                } else {
+                    console.log("status del envio: " + this.status);
                 }
               };
               xhttp.open("POST", "<%=sessionUrl%>", false); //false = sincrona
-              xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+              xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
               xhttp.send("id=" + faceId + "&email=" + email + "&name=" + name + "&source=<%=SessionInitializer.FACEBOOK%>");
             });
           }
           function faceLogin() {
             FB.login(function(response) {
-              console.log(JSON.stringify(response));
               if (response.authResponse) {
                 openSWBSession();
               }
@@ -208,7 +208,6 @@
                     sessionAlert = "La sesión de Facebook ha terminado. Favor de iniciar sesión de nuevo.";
                 }
 %>
-            console.log('response: ' + JSON.stringify(response));
             if (response.status && response.status !== 'connected') {
               //reenviar a seccion con id de usuario de facebook y crear sesion con SWB
               alert('<%=sessionAlert%>');
@@ -217,16 +216,19 @@
           }
 
           function closeSWBSession() {
-            FB.logout(function(response) {
-              var xhttp = new XMLHttpRequest();
-              xhttp.onreadystatechange = function() {
-                if (this.readyState === 4 && this.status === 200) {
-                  location.reload();
-                }
-              };
-              xhttp.open("GET", "<%=url%>", false); //false = sincrona
-              xhttp.send();
-            });
+            try {
+                FB.logout();
+            } catch(err) {
+                console.log('Sesion terminada primero en Facebook');
+            }
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+              if (this.readyState === 4 && this.status === 200) {
+                location.reload();
+              }
+            };
+            xhttp.open("GET", "<%=url%>", false); //false = sincrona
+            xhttp.send();
 <%
             }
             //dar la opcion a terminar la sesion
