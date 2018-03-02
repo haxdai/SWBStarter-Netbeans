@@ -1,19 +1,21 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="mx.gob.cultura.portal.response.Entry"%>
 <%@page import="mx.gob.cultura.portal.response.Utils, mx.gob.cultura.portal.response.DigitalObject"%>
-<%@page import="mx.gob.cultura.portal.response.Title,org.semanticwb.model.WebSite, org.semanticwb.portal.api.SWBParamRequest, org.semanticwb.portal.api.SWBResourceURL, java.util.List"%>
-<script type="text/javascript" src="/swbadmin/js/dojo/dojo/dojo.js"
-        djConfig="parseOnLoad: true, isDebug: false, locale: 'en'"></script>
+<%@page import="mx.gob.cultura.portal.response.Title,org.semanticwb.model.WebSite, org.semanticwb.portal.api.SWBParamRequest, org.semanticwb.portal.api.SWBResourceURL, java.util.List, java.util.ArrayList"%>
+<script type="text/javascript" src="/swbadmin/js/dojo/dojo/dojo.js" djConfig="parseOnLoad: true, isDebug: false, locale: 'en'"></script>
 <%
     SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
     SWBResourceURL pageURL = paramRequest.getRenderUrl().setMode("PAGE");
     pageURL.setCallMethod(SWBParamRequest.Call_DIRECT);
     SWBResourceURL pagesURL = paramRequest.getRenderUrl().setMode("PAGES");
     pagesURL.setCallMethod(SWBParamRequest.Call_DIRECT);
-    List<Entry> references = (List<Entry>)session.getAttribute("PAGE_LIST");
+    WebSite site = paramRequest.getWebPage().getWebSite();
+    Integer last = (Integer)session.getAttribute("LAST_RECORD");
+    Integer first = (Integer)session.getAttribute("FIRST_RECORD");
+    Integer total = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
     String word = (String)request.getAttribute("word");
     if (null != word) word = Utils.suprXSS(word);
-    WebSite site = paramRequest.getWebPage().getWebSite();
+    List<Entry> references = null != session.getAttribute("PAGE_LIST") ? (List<Entry>)session.getAttribute("PAGE_LIST") : new ArrayList<>();
 %>
 <script type="text/javascript">
     function setList() { doPage(1, 'l', 'relvdes'); }
@@ -23,84 +25,125 @@
             url: '<%=pageURL%>?p='+p+'&m='+m+'&sort='+f+'&word=<%=word%>',
             load: function(data) {
                 dojo.byId('references').innerHTML=data;
-		location.href = '#showPage';
+				location.href = '#showPage';
             }
         });
     }
 </script>
-
-<h2 class="oswM rojo titulo">Resultados de la búsqueda</h2>
+<div class="row resultadosbar">
+    <div class="col-md-3"><a class=" oswL" href="javascript:history.go(-1)"><i aria-hidden="true" class="fa fa-long-arrow-left"></i> Regresar</a></div>
+    <div class="col-md-9">
+        <p class=" oswL">
+            <% if (null != word) { %>
+                Colección / Resultados de: <%=word%>
+            <% }else { out.println("Debe proporcionar un criterio de búsqueda"); } %>
+        </p>
+    </div>
+</div>
 <div class="row offcanvascont">
-    <% if (!references.isEmpty()) {  %>
-        <div class="offcanvas rojo-bg">
-            <span id="offcanvasAbre" onclick="openNav()"> Filtros <i aria-hidden="true" class="ion-chevron-right "></i> </span> <span id="offcanvasCierra" onclick="closeNav()"> Filtros <i aria-hidden="true" class="ion-close "></i> </span>
-        </div>
-        <jsp:include page="filters.jsp" flush="true"/>
-    <% } %>
+    <div class="offcanvas rojo-bg">
+	<span onclick="openNav()" id="offcanvasAbre">
+            <em class="fa fa-sliders" aria-hidden="true"></em> Filtros <i class="ion-chevron-right " aria-hidden="true"></i>
+        </span>
+        <span onclick="closeNav()" id="offcanvasCierra">
+            <em class="fa fa-sliders" aria-hidden="true"></em> Filtros <i class="ion-close " aria-hidden="true"></i>
+        </span>
+    </div>
+    <jsp:include page="filters.jsp" flush="true"/>
     <div id="contenido">
-        <div class="ruta oswL">
-			<a name="showPage"></a>
-            <a class="rojo" href="javascript:history.go(-1)"><i aria-hidden="true" class="fa fa-long-arrow-left"></i> Regresar</a> | <a href="/swb/<%=site.getId()%>/home">Inicio</a> / Resultados de la b&uacute;squeda
-        </div>
-        <% if (!references.isEmpty()) {  %>
-        <div class="ordenar">
-            <div class="row">
-                <div class="col-lg-6">&nbsp;</div>
-                <div class="col-lg-3 oswL dropdown show">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Ordenar por:
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <a class="dropdown-item" href="#" onclick="doSort(<% out.print("'"+word+"','datedes'"); %>)">Fecha</a>
-                        <a class="dropdown-item" href="#" onclick="doSort(<% out.print("'"+word+"','relvdes'"); %>)">Relevancia</a>
-                        <a class="dropdown-item" href="#" onclick="doSort(<% out.print("'"+word+"','statdes'"); %>)">Popularidad</a>
-                    </div>
-                </div>
-                <div class="col-lg-3">
+	<a name="showPage"></a>
+	<% if (!references.isEmpty()) {  %>
+        <div id="references">
+            <div class="ruta row">
+		<div class="col-12 col-sm-8 col-md-8">
+                    <p class="oswLc"><%=first%>-<%=last%> de <%=total%> resultados</p>
+		</div>
+		<div class="col-12 col-sm-4 col-md-4 ordenar">
                     <a href="#" onclick="setGrid();"><i class="fa fa-th select" aria-hidden="true"></i></a>
                     <a href="#" onclick="setList();"><i class="fa fa-th-list" aria-hidden="true"></i></a>
-                </div>
+		</div>
             </div>
-        </div>
-        <p class="float-left d-md-none">
-            <button type="button" class="btn btn-sm rojo-bg" data-toggle="offcanvas">
-                <span class="ion-chevron-left"> Ocultar filtros</span>
-                <span class="ion-chevron-right"> Mostrar filtros</span>
-            </button>
-        </p>
-
-        <div id="references">
-            <div id="recientes" class="row">
+            <div id="resultados" class="card-columns">
                 <%
                     for (Entry reference : references) {
-                        String creator = "";
                         Title title = new Title();
                         DigitalObject digital = new DigitalObject();
-                        List<Title> titles = reference.getRecordtitle();
                         List<String> creators = reference.getCreator();
+			List<Title> titles = reference.getRecordtitle();
+			List<String> resourcetype = reference.getResourcetype();
                         List<DigitalObject> digitalobject = reference.getDigitalobject();
-                        if (!digitalobject.isEmpty()) digital = digitalobject.get(0);
                         if (!titles.isEmpty()) title = titles.get(0);
-                        if (!creators.isEmpty()) creator = creators.get(0);
+                        String creator = creators.size() > 0 ? creators.get(0) : "";
+			String type = resourcetype.size() > 0 ? resourcetype.get(0) : "";
+			if (!digitalobject.isEmpty()) digital = digitalobject.get(0);
                 %>
-                <div class="pieza">
-                    <div>
-                        <a href="/swb/<%=site.getId()%>/detalle?id=<%=reference.getId()%>">
-                            <img src="<%=digital.getUrl()%>" />
-                        </a>
-                    </div>
-                    <p class="oswB azul tit"><a href="#"><%=title.getValue()%></a></p>
-                    <p class="azul autor"><a href="#"><%=creator%></a></p>
-                </div>
+                        <div class="pieza-res card">
+                            <a href="/swb/<%=site.getId()%>/detalle?id=<%=reference.getId()%>">
+                                <img src="<%=digital.getUrl()%>" />
+                            </a>
+                            <div>
+                                <p class="oswB azul tit"><a href="#"><%=title.getValue()%></a></p>
+                                <p class="azul autor"><a href="#"><%=creator%></a></p>
+                                <p class="tipo"><%=type%></p>
+                            </div>
+                        </div>
                 <%
                     }
                 %>
             </div>
             <jsp:include page="pager.jsp" flush="true"/>
         </div>
-        <%
+	<%
             }else if (null != word) { out.println("No se encontraron resultados para la búsqueda " + word); }
-            else { out.println("Debe proporcionar un criterio de búsqueda"); }
         %>
+	<!-- PIE -->
+        <footer class="gris21-bg">
+            <div class="container">  
+		<div class="logo-cultura">
+                    <img src="/work/models/repositorio/img/logo-cultura.png" class="img-responsive">
+                </div>            
+                <div class="row pie-sube">
+                    <a href="#top">
+                        <i class="ion-ios-arrow-thin-up" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="row datos">
+                    <!-- order-sm-2 order-2 -->
+                    <div class="col-7 col-sm-6 col-md-4 col-lg-4 datos1">
+                        <ul>
+                            <li><a href="#">Quiénes somos y qué hacemos</a></li>
+                            <li><a href="#">Nuestros proveedores de datos</a></li>
+                            <li><a href="#">Cómo colaborar con nosotros</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-5 col-sm-6 col-md-4 col-lg-4 datos2">
+                        <ul>
+                            <li><a href="#">Declaración de derechos</a></li>
+                            <li><a href="#">Documentación</a></li>
+                            <li><a href="#">Red de Preservación</a></li>
+                        </ul>
+                    </div>
+                    <hr class="d-md-none">
+                    <div class="col-7 col-sm-6 col-md-4 col-lg-4 datos3">
+                        <ul>
+                            <li><a href="#">Contacto</a></li>
+                            <li><a href="#">1234 5678 ext. 123 y 456</a></li>
+                            <li><a href="#">email@cultura.gob.mx</a></li>
+                        </ul>
+                    </div>
+                    <hr class="d-none d-sm-none d-md-block">
+                    <div class="col-5 col-sm-6 col-md-12 col-lg-12 datos4">
+                        <ul class="row">
+                            <li class="col-md-4"><a href="#">Mapa de sitio</a></li>
+                            <li class="col-md-4"><a href="#">Política de Privacidad</a></li>
+                            <li class="col-md-4"><a href="#">Términos de uso</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <div class="container-fluid pie-derechos">
+            <p>Secretaría de Cultura, 2017. Todos los derechos reservados.</p>
+        </div>
     </div>
 </div>

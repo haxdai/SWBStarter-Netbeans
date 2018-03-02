@@ -5,7 +5,6 @@
  */
 package mx.gob.cultura.portal.response;
 
-import com.hp.hpl.jena.sparql.sse.lang.parser.ParseException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
