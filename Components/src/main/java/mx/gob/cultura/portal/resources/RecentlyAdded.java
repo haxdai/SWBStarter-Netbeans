@@ -21,7 +21,6 @@ import org.semanticwb.model.WebSite;
  */
 public class RecentlyAdded extends GenericAdmResource {
     
-    
     private static final Logger LOG = Logger.getLogger(RecentlyAdded.class.getName());
 
     
