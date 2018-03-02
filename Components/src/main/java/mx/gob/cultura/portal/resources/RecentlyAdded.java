@@ -3,9 +3,8 @@ package mx.gob.cultura.portal.resources;
 import mx.gob.cultura.portal.request.ListBICRequest;
 import mx.gob.cultura.portal.response.Document;
 import mx.gob.cultura.portal.response.Entry;
-import org.semanticwb.portal.api.GenericResource;
+import org.semanticwb.portal.api.GenericAdmResource;
 import org.semanticwb.portal.api.SWBParamRequest;
-import org.semanticwb.portal.api.SWBResourceException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,7 +19,7 @@ import org.semanticwb.model.WebSite;
  * Muestra los n elementos recien agregados al repositorio
  * @author jose.jimenez
  */
-public class RecentlyAdded extends GenericResource {
+public class RecentlyAdded extends GenericAdmResource {
     
     
     private static final Logger LOG = Logger.getLogger(RecentlyAdded.class.getName());
@@ -52,12 +51,18 @@ public class RecentlyAdded extends GenericResource {
      */
     private List<Entry> getReferences(WebSite webSite) {
         String baseUri = webSite.getModelProperty("search_endPoint");
-//        String uri = getResourceBase().getAttribute("endpointURL", "https://search.innovatic.com.mx") + "/api/v1/search?sort=-indexcreated&size=10";
         List<Entry> publicationList = new ArrayList<>();
+        Integer numElements;
+        
+        try {
+            numElements = Integer.parseInt(this.getResourceBase().getAttribute("numElements", "10"));
+        } catch (NumberFormatException nfe) {
+            numElements = 10;
+        }
         
         if (null != baseUri) {
             ListBICRequest req = new ListBICRequest(baseUri +
-                    "/api/v1/search?sort=-indexcreated&size=10");
+                    "/api/v1/search?sort=-indexcreated&size=" + numElements);
 
             Document resp = req.makeRequest();
             if (null != resp) {
