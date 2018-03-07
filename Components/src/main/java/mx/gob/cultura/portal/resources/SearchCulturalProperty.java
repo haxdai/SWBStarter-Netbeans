@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +28,10 @@ import javax.servlet.http.HttpSession;
 import org.semanticwb.SWBPlatform;
 
 import static mx.gob.cultura.portal.resources.PagerAction.NUM_PAGE_LIST;
+import mx.gob.cultura.portal.response.Aggregation;
+import mx.gob.cultura.portal.response.CountName;
+import mx.gob.cultura.portal.response.DateRange;
+import mx.gob.cultura.portal.response.Utils;
 
 /**
  *
@@ -117,9 +123,10 @@ public class SearchCulturalProperty extends PagerAction {
     		document = getReference(request);
                 if (null != document) {
                     publicationList = document.getRecords();
-                    request.setAttribute("aggs", document.getAggs());
-                    request.getSession().setAttribute("NUM_RECORDS_TOTAL", document.getTotal());
+                    request.setAttribute("aggs", getAggregation(document.getAggs()));
+                    request.setAttribute("creators", getCreators(document.getRecords()));
                     request.getSession().setAttribute(FULL_LIST, document.getRecords());
+                    request.getSession().setAttribute("NUM_RECORDS_TOTAL", document.getTotal());
                 }
                 request.setAttribute("word", request.getParameter("word"));
                 init(request, response, paramRequest);
@@ -177,7 +184,7 @@ public class SearchCulturalProperty extends PagerAction {
         String url = "/swbadmin/jsp/rnc/rows.jsp";
         if (null != request.getParameter("m") && "l".equalsIgnoreCase(request.getParameter("m")))
             request.setAttribute("mode", "row lista");
-        else request.setAttribute("mode", "row");
+        else request.setAttribute("mode", "card-columns");
         request.setAttribute("m",request.getParameter("m"));
         RequestDispatcher rd = request.getRequestDispatcher(url);
         try {
@@ -207,6 +214,69 @@ public class SearchCulturalProperty extends PagerAction {
             LOG.log(Level.SEVERE, se.getMessage());
         }
         return document;
+    }
+    
+    private List<String> getCreators(List<Entry> records) {
+        List<String> creators = new ArrayList<>();
+        for (Entry entry : records) {
+            for (String author : entry.getCreator()) {
+                author = getCapitalizeName(author);
+                if (!creators.contains(author))
+                    creators.add(author);
+            }
+        }
+        return creators;
+    }
+    
+    public static String getCapitalizeName(String name) {
+        if (null == name) return "";
+        name = name.trim();
+        if (name.isEmpty() || name.length() < 2) return name;
+	name = name.toLowerCase();
+        if (name.contains(" ")) {
+            String[] words = name.split(" ");
+            StringBuilder capitalize = new StringBuilder();
+            for (int i=0; i<words.length; i++) {
+                String word = words[i].trim();
+                if (word.length() > 2) word = Character.toUpperCase(word.charAt(0)) + word.substring(1);
+                if (!word.contains(","))
+                    capitalize.append(word).append(" ");
+                else {
+                    word = word.replace(",","");
+                    capitalize.append(word);
+                    break;
+                }
+            }
+            name = capitalize.toString().trim();
+        }else
+            name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        return name;
+    }
+    
+    private Aggregation getAggregation(List<Aggregation> aggs) {
+        DateRange interval = new DateRange();
+        Calendar cal = Calendar.getInstance();
+        Aggregation aggregation = new Aggregation();
+        interval.setUpperLimit(0);
+        cal.setTime(new Date());
+        interval.setLowerLimit(cal.get(Calendar.YEAR));
+        aggregation.setInterval(interval);
+        if (null != aggs && !aggs.isEmpty()) {
+            aggregation.setDates(new ArrayList<>());
+            aggregation.setHolders(new ArrayList<>());
+            aggregation.setResourcetypes(new ArrayList<>());
+            for (Aggregation a : aggs) {
+                if (null !=  a.getDates()) aggregation.getDates().addAll(a.getDates());
+                if (null !=  a.getHolders()) aggregation.getHolders().addAll(a.getHolders());
+                if (null !=  a.getResourcetypes()) aggregation.getResourcetypes().addAll(a.getResourcetypes());
+            }
+            for (CountName date : aggregation.getDates()) {
+                cal.setTime(Utils.convert(date.getName()));
+                if (interval.getUpperLimit() < cal.get(Calendar.YEAR)) interval.setUpperLimit(cal.get(Calendar.YEAR));
+                if (interval.getLowerLimit() > cal.get(Calendar.YEAR)) interval.setLowerLimit(cal.get(Calendar.YEAR));
+            }
+        }
+        return aggregation;
     }
     
     private String getRange(HttpServletRequest request) {
