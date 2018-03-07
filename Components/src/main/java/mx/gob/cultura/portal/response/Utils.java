@@ -5,12 +5,16 @@
  */
 package mx.gob.cultura.portal.response;
 
+import java.io.Writer;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import java.util.Date;
 import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import static java.lang.Integer.parseInt;
 
 /**
  *
@@ -72,5 +76,26 @@ public class Utils {
             e.printStackTrace();
             return new Date();
         }
+    }
+    
+    public static int toInt(Object obj) {
+        if (null == obj) return -1;
+        int result = 0;	
+        if (obj instanceof Long){
+            result = ((Long)obj).intValue();
+        } else if (obj instanceof Integer){
+            result = ((Integer)obj);
+        } else if (obj instanceof BigDecimal){
+            result = ((BigDecimal)obj).intValue();
+        } else if (obj instanceof BigInteger){
+            result = ((BigInteger)obj).intValue();
+        } else if (obj instanceof Double){
+            result = ((Double)obj).intValue();
+        } else if (obj instanceof String){
+            result = parseInt((String)obj);
+        } else if (obj instanceof Number){		
+            result = ((Number)obj).intValue();
+        }	
+        return result;
     }
 }

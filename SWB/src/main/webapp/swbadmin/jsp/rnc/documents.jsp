@@ -65,8 +65,10 @@
             </div>
             <div id="resultados" class="card-columns">
                 <%
+                    int position = first;
                     for (Entry reference : references) {
                         Title title = new Title();
+                        reference.setPosition(position);
                         DigitalObject digital = new DigitalObject();
                         List<String> creators = reference.getCreator();
 			List<Title> titles = reference.getRecordtitle();
@@ -88,6 +90,7 @@
                             </div>
                         </div>
                 <%
+                        position++;
                     }
                 %>
             </div>
