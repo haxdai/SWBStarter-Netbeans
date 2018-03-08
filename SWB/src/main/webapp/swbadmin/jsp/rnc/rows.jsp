@@ -14,7 +14,7 @@
 <div id="references">
     <div id="recientes" class="<%=mode%>">
         <%      for (Entry reference : references) {
-            Identifier identifier = new Identifier();
+            //Identifier identifier = new Identifier();
             DigitalObject digital = new DigitalObject();
             List<Title> titles = reference.getRecordtitle();
             List<String> creators = reference.getCreator();

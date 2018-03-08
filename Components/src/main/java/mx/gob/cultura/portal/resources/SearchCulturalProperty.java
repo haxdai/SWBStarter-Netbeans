@@ -218,11 +218,13 @@ public class SearchCulturalProperty extends PagerAction {
     
     private List<String> getCreators(List<Entry> records) {
         List<String> creators = new ArrayList<>();
-        for (Entry entry : records) {
-            for (String author : entry.getCreator()) {
-                author = getCapitalizeName(author);
-                if (!creators.contains(author))
-                    creators.add(author);
+        if (null != records) {
+            for (Entry entry : records) {
+                for (String author : entry.getCreator()) {
+                    author = getCapitalizeName(author);
+                    if (!creators.contains(author))
+                        creators.add(author);
+                }
             }
         }
         return creators;
