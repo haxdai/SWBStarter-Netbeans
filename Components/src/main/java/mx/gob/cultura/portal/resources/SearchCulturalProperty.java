@@ -8,6 +8,9 @@ package mx.gob.cultura.portal.resources;
 import mx.gob.cultura.portal.request.ListBICRequest;
 import mx.gob.cultura.portal.response.Document;
 import mx.gob.cultura.portal.response.Entry;
+import org.semanticwb.Logger;
+import org.semanticwb.SWBUtils;
+import org.semanticwb.model.WebSite;
 import org.semanticwb.portal.api.SWBParamRequest;
 import org.semanticwb.portal.api.SWBResourceException;
 import org.semanticwb.portal.api.SWBResourceModes;
@@ -22,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
 import org.semanticwb.SWBPlatform;
 
@@ -40,7 +41,7 @@ import mx.gob.cultura.portal.response.Utils;
 public class SearchCulturalProperty extends PagerAction {
     
     private static final int SEGMENT = 8;
-    private static final Logger LOG = Logger.getLogger(SearchCulturalProperty.class.getName());
+    private static final Logger LOG = SWBUtils.getLogger(SearchCulturalProperty.class);
     
     @Override
     public void doAdmin(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws IOException {
@@ -118,25 +119,27 @@ public class SearchCulturalProperty extends PagerAction {
         List<Entry> publicationList = new ArrayList<>();
     	String url = "/swbadmin/jsp/rnc/documents.jsp";
     	RequestDispatcher rd = request.getRequestDispatcher(url);
-    	try {
-            if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
-    		document = getReference(request);
-                if (null != document) {
-                    publicationList = document.getRecords();
-                    request.setAttribute("aggs", getAggregation(document.getAggs()));
-                    request.setAttribute("creators", getCreators(document.getRecords()));
-                    request.getSession().setAttribute(FULL_LIST, document.getRecords());
-                    request.getSession().setAttribute("NUM_RECORDS_TOTAL", document.getTotal());
-                }
-                request.setAttribute("word", request.getParameter("word"));
-                init(request, response, paramRequest);
-    	    }
+
+        if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
+            document = getReference(request, paramRequest.getWebPage().getWebSite());
+            if (null != document) {
+                publicationList = document.getRecords();
+                request.setAttribute("aggs", getAggregation(document.getAggs()));
+                request.setAttribute("creators", getCreators(document.getRecords()));
+                request.getSession().setAttribute(FULL_LIST, document.getRecords());
+                request.getSession().setAttribute("NUM_RECORDS_TOTAL", document.getTotal());
+            }
+            request.setAttribute("word", request.getParameter("word"));
+            init(request, response, paramRequest);
+        }
+
+        try {
             request.setAttribute("references", publicationList);
-	    request.setAttribute("paramRequest", paramRequest);
-	    rd.include(request, response);
-	}catch (ServletException se) {
-            LOG.log(Level.SEVERE, se.getMessage());
-	}
+            request.setAttribute("paramRequest", paramRequest);
+            rd.include(request, response);
+        } catch (ServletException se) {
+            LOG.error(se);
+        }
     }
     
     @Override
@@ -145,7 +148,7 @@ public class SearchCulturalProperty extends PagerAction {
         List<Entry> publicationList = new ArrayList<>();
         try {
             if (null != request.getParameter("word") && !request.getParameter("word").isEmpty()) {
-    		document = getReference(request);
+    		document = getReference(request, paramRequest.getWebPage().getWebSite());
                 if (null != document) {
                     publicationList = document.getRecords();
                     request.getSession().setAttribute(FULL_LIST, document.getRecords());
@@ -157,7 +160,7 @@ public class SearchCulturalProperty extends PagerAction {
             request.setAttribute("references", publicationList);
 	    request.setAttribute("paramRequest", paramRequest);
 	}catch (Exception se) {
-            LOG.log(Level.SEVERE, se.getMessage());
+            LOG.error(se);
 	}
         super.doSort(request, response, paramRequest);
     }
@@ -174,7 +177,7 @@ public class SearchCulturalProperty extends PagerAction {
         if (pagenum<=0) pagenum = 1;
         session.setAttribute(NUM_PAGE_LIST, pagenum);
         session.setAttribute("PAGE_NUM_ROW", PAGE_NUM_ROW);
-        document = getReference(request);
+        document = getReference(request, paramRequest.getWebPage().getWebSite());
         if (null != document) {
             publicationList = document.getRecords();
             request.getSession().setAttribute(FULL_LIST, publicationList);
@@ -195,10 +198,19 @@ public class SearchCulturalProperty extends PagerAction {
         }
     }
     
-    private Document getReference(HttpServletRequest request) {
+    private Document getReference(HttpServletRequest request, WebSite site) {
         Document document = null;
         String words = request.getParameter("word");
-    	String uri = SWBPlatform.getEnv("rnc/endpointURL",getResourceBase().getAttribute("endpointURL","http://localhost:8080")).trim() + "/api/v1/search?q=";
+
+        //Get baseURI from site properties first
+        String baseUri = site.getModelProperty("search_endPoint");
+        if (null == baseUri || baseUri.isEmpty()) {
+            baseUri = SWBPlatform.getEnv("rnc/endpointURL",
+                    getResourceBase().getAttribute("endpointURL",
+            "http://localhost:8080")).trim();
+        }
+
+    	String uri = baseUri + "/api/v1/search?q=";
     	uri += getParamSearch(words);
         uri += getRange(request);
         if (null != request.getParameter("sort")) {
@@ -211,18 +223,20 @@ public class SearchCulturalProperty extends PagerAction {
         try {
             document = req.makeRequest();
         }catch (Exception se) {
-            LOG.log(Level.SEVERE, se.getMessage());
+            LOG.error(se);
         }
         return document;
     }
     
     private List<String> getCreators(List<Entry> records) {
         List<String> creators = new ArrayList<>();
-        for (Entry entry : records) {
-            for (String author : entry.getCreator()) {
-                author = getCapitalizeName(author);
-                if (!creators.contains(author))
-                    creators.add(author);
+        if (null != records) {
+            for (Entry entry : records) {
+                for (String author : entry.getCreator()) {
+                    author = getCapitalizeName(author);
+                    if (!creators.contains(author))
+                        creators.add(author);
+                }
             }
         }
         return creators;

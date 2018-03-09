@@ -5,8 +5,8 @@
  */
 package mx.gob.cultura.portal.response;
 
-import java.util.List;
 import java.io.Serializable;
+import java.util.List;
 /**
  *
  * @author sergio.tellez
