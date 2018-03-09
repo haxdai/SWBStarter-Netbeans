@@ -15,7 +15,10 @@
     Integer total = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
     String word = (String)request.getAttribute("word");
     if (null != word) word = Utils.suprXSS(word);
-    List<Entry> references = null != session.getAttribute("PAGE_LIST") ? (List<Entry>)session.getAttribute("PAGE_LIST") : new ArrayList<>();
+    List references = (List)session.getAttribute("PAGE_LIST");
+    if (null == references) references = new ArrayList();
+
+    //= null != session.getAttribute("PAGE_LIST") ? (List<Entry>)session.getAttribute("PAGE_LIST") : new ArrayList<>();
 %>
 <script type="text/javascript">
     function setList() { doPage(1, 'l', 'relvdes'); }
@@ -66,7 +69,8 @@
             <div id="resultados" class="card-columns">
                 <%
                     int position = first;
-                    for (Entry reference : references) {
+                    for (Object o : references) {
+                        Entry reference = (Entry)o;
                         Title title = new Title();
                         reference.setPosition(position);
                         DigitalObject digital = new DigitalObject();
