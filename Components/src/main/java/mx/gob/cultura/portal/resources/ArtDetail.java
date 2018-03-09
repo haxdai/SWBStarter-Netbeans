@@ -5,23 +5,22 @@
  */
 package mx.gob.cultura.portal.resources;
 
-import java.io.IOException;
-import org.semanticwb.portal.api.SWBParamRequest;
+import mx.gob.cultura.portal.request.GetBICRequest;
+import mx.gob.cultura.portal.response.Entry;
+import mx.gob.cultura.portal.response.Utils;
+import org.semanticwb.SWBPlatform;
 import org.semanticwb.portal.api.GenericAdmResource;
+import org.semanticwb.portal.api.SWBParamRequest;
+import org.semanticwb.portal.api.SWBResourceException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.net.URL;
+import java.io.IOException;
 import java.net.HttpURLConnection;
-
+import java.net.URL;
 import java.util.logging.Logger;
-import mx.gob.cultura.portal.response.Utils;
-import mx.gob.cultura.portal.response.Entry;
-import mx.gob.cultura.portal.request.GetBICRequest;
-import org.semanticwb.portal.api.SWBResourceException;
 
 /**
  *
@@ -46,7 +45,15 @@ public class ArtDetail extends GenericAdmResource {
     
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws IOException {
-        String uri = getResourceBase().getAttribute("url","http://localhost:8080") + "/api/v1/search?identifier=";
+        //Get baseURI from site properties first
+        String baseUri = paramRequest.getWebPage().getWebSite().getModelProperty("search_endPoint");
+        if (null == baseUri || baseUri.isEmpty()) {
+            baseUri = SWBPlatform.getEnv("rnc/endpointURL",
+                    getResourceBase().getAttribute("url",
+                            "http://localhost:8080")).trim();
+        }
+
+        String uri = baseUri + "/api/v1/search?identifier=";
         String path = "/swbadmin/jsp/rnc/artdetail.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(path);
         try {
@@ -56,7 +63,7 @@ public class ArtDetail extends GenericAdmResource {
                 Entry entry = req.makeRequest();
                 if (null != entry) {
                     entry.setPosition(Utils.toInt(request.getParameter(POSITION)));
-                    uri = getResourceBase().getAttribute("url","http://localhost:8080")
+                    uri = baseUri
                             + "/api/v1/search/hits/"
                             + entry.getId();
                     URL url = new URL(uri);
@@ -76,7 +83,14 @@ public class ArtDetail extends GenericAdmResource {
     }
     
     public void doDigital(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws java.io.IOException {
-        String uri = getResourceBase().getAttribute("url","http://localhost:8080") + "/api/v1/search?identifier=";
+        //Get baseURI from site properties first
+        String baseUri = paramRequest.getWebPage().getWebSite().getModelProperty("search_endPoint");
+        if (null == baseUri || baseUri.isEmpty()) {
+            baseUri = SWBPlatform.getEnv("rnc/endpointURL",
+                    getResourceBase().getAttribute("url",
+                            "http://localhost:8080")).trim();
+        }
+        String uri = baseUri + "/api/v1/search?identifier=";
         String path = "/swbadmin/jsp/rnc/digitalobj.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(path);
         try {
@@ -85,7 +99,7 @@ public class ArtDetail extends GenericAdmResource {
                 GetBICRequest req = new GetBICRequest(uri);
                 Entry entry = req.makeRequest();
                 if (null != entry) {
-                    uri = getResourceBase().getAttribute("url","http://localhost:8080")
+                    uri = baseUri
                         + "/api/v1/search/hits/"
                         + entry.getId();
                     URL url = new URL(uri);
