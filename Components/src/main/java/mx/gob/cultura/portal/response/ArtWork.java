@@ -48,7 +48,7 @@ public class ArtWork implements Serializable {
     public void setFavorite(Boolean favorite) {
         this.favorite = favorite;
     }
-
+   
     @Override
     public String toString() {
         return "ArtWork{" + "entry=" + entry + ", hidden=" + hidden + ", favorite=" + favorite + '}';
