@@ -36,11 +36,11 @@
             if (!titles.isEmpty()) title = titles.get(0).getValue();
 	}
     }
-    Integer records = (Integer)session.getAttribute("NUM_RECORDS_TOTAL");
     SWBParamRequest paramRequest = (SWBParamRequest)request.getAttribute("paramRequest");
     WebSite site = paramRequest.getWebPage().getWebSite();
     SWBResourceURL digitURL = paramRequest.getRenderUrl().setMode("DIGITAL");
     digitURL.setCallMethod(SWBParamRequest.Call_DIRECT);
+    Integer records = null != session.getAttribute("NUM_RECORDS_TOTAL") ? (Integer)session.getAttribute("NUM_RECORDS_TOTAL") : 0;
 %>
 <script>
     function add(id) {
