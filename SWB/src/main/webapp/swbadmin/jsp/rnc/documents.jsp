@@ -108,8 +108,5 @@
         <%
             }else if (null != word) { out.println("No se encontraron resultados para la búsqueda " + q); }
         %>
-        <div class="container-fluid pie-derechos">
-            <p>Secretaría de Cultura, 2017. Todos los derechos reservados.</p>
-        </div>
     </div>
 </div>
