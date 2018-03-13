@@ -103,14 +103,11 @@ public class FavoritesMgr extends GenericResource {
     
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramRequest) throws SWBResourceException, IOException {
-        User user = paramRequest.getUser();
         response.setContentType("text/html; charset=UTF-8");
-        List<Collection> collectionList = new ArrayList<>();
         String path = "/swbadmin/jsp/rnc/collections/treecollection.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(path);
-        if (null != user && user.isSigned() && null != request.getSession().getAttribute("mycollections"))
-            collectionList = (List<Collection>)request.getSession().getAttribute("mycollections");
         try {
+            List<Collection> collectionList = MyCollections.collectionList(request, paramRequest.getUser());
             request.setAttribute("paramRequest", paramRequest);
             request.setAttribute("mycollections", collectionList);
             request.setAttribute("entry", request.getParameter(IDENTIFIER));

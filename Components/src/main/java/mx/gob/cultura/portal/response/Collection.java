@@ -83,6 +83,10 @@ public class Collection implements Serializable {
     public void setUserid(String userid) {
         this.userid = userid;
     }
+    
+    public boolean isEmpty() {
+        return null == this.title;
+    }
 
     @Override
     public String toString() {
