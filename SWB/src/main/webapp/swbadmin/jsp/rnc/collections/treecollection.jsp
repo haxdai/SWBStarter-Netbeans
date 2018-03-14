@@ -101,7 +101,7 @@
         %>
 		<div class="row">
                     <div class="owl-nav col">
-                        <span class="oswB blanco">* Selecciona una colección: </span>
+                        <span class="oswB rojo">* Selecciona una colección: </span>
                             <select name="idcollection" id="idcollection">
 				<option value=""></option>
         <%
